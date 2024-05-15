@@ -2,7 +2,6 @@
 (function() {
     'use strict';
 
-console.log('HI')
     function clickElement(selector) {
         let element = document.querySelector(selector);
         if (element) {
