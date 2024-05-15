@@ -29,7 +29,6 @@
         };
         return date.toLocaleString('en-US', options);
     }
-    const socket = io('http://localhost:5000');
     function sendDataToServer(yesData, noData, title,currentTime) {
         socket.emit('order_book_data', { 
             yesData, 
@@ -88,15 +87,19 @@
             console.error("Order book element not found.");
         }
     }
+    var scriptElement = document.createElement('script');
+    scriptElement.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js";
+    document.head.appendChild(scriptElement);
 
     setTimeout(function() {
-        clickElement(".style_arena__filter__item__3VlSl:nth-child(4)");
-
+        clickElement(".style_arena__filter__item__3VlSl:nth-child(4)");    
         setTimeout(function() {
             clickElement('.style_event__card__actions__button__107m2.style_event__card__actions__button__yes__2V1x2');
 
             setTimeout(function() {
                 clickElement('.style_order__book__top__3keFx');
+                const socket = io('http://localhost:5000');
+
                 setInterval(handleOrderBook, 200)
             }, 1000);
         }, 1500);
