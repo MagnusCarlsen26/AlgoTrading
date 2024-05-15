@@ -1,35 +1,8 @@
-// ==UserScript==
-// @name         IPL
-// @namespace    http://localhost:5000/
-// @version      0.1
-// @description  IPL
-// @author       Sindhav Khushal
-// @match        https://trading.probo.in/arena
-// @grant        GM_xmlhttpRequest
-// ==/UserScript==
+
 (function() {
     'use strict';
 
-    function dragSlider(className, newValue) {
-    var sliderButton = document.querySelector('.' + className + ' .style_rsbcSliderCircle__2Vh-4'); // Select slider button by class
-    var slider = sliderButton.parentElement; // Get parent element of slider button
-    var sliderRect = slider.getBoundingClientRect();
-
-    var sliderButtonRect = sliderButton.getBoundingClientRect();
-    var sliderButtonOffset = sliderButtonRect.left - sliderRect.left; // Calculate offset of slider button within slider
-
-    var endX = sliderRect.left + (sliderRect.width * parseFloat(newValue) / 100) - sliderButtonOffset;
-
-    var mouseDownEvent = new MouseEvent('mousedown');
-    var mouseMoveEvent = new MouseEvent('mousemove');
-    var mouseUpEvent = new MouseEvent('mouseup');
-
-    sliderButton.dispatchEvent(mouseDownEvent);
-    sliderButton.dispatchEvent(mouseMoveEvent);
-    sliderButton.dispatchEvent(new MouseEvent('mousemove', { clientX: endX }));
-    sliderButton.dispatchEvent(mouseUpEvent);
-    }
-
+console.log('HI')
     function clickElement(selector) {
         let element = document.querySelector(selector);
         if (element) {
@@ -57,63 +30,27 @@
         };
         return date.toLocaleString('en-US', options);
     }
-
-// ==UserScript==
-// @name         Send Data to Server
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Send data to the server
-// @author       You
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
-    function sendDataToServer(yesData, noData, title) {
-        // Define the data you want to send
-        var data = {
-            yesData: yesData,
-            noData: noData,
-            title: title
-        };
-
-        var jsonData = JSON.stringify(data);
-        var serverUrl = 'http://localhost:5000';
-
-        fetch(serverUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Data sent successfully:', data);
-        })
-        .catch(error => {
-            console.error('Error sending data:', error);
+    const socket = io('http://localhost:5000');
+    function sendDataToServer(yesData, noData, title,currentTime) {
+        socket.emit('order_book_data', { 
+            yesData, 
+            noData, 
+            title,
+            currentTime
         });
     }
 
     function convertStringToTime(timeString) {
-        // Split the string into hours, minutes, and AM/PM
         const [time, period] = timeString.split(' ');
         const [hours, minutes] = time.split('-').map(Number);
 
-        // Convert hours to 24-hour format if PM
         let hours24 = hours;
         if (period === 'PM' && hours !== 12) {
             hours24 = hours + 12;
         } else if (period === 'AM' && hours === 12) {
-            // Convert 12 AM to 24-hour format (midnight)
             hours24 = 0;
         }
 
-        // Create a new Date object with the given hours and minutes
         const date = new Date();
         date.setHours(hours24);
         date.setMinutes(minutes);
@@ -143,7 +80,7 @@
             var currentTime = new Date();
 
             if (timeOfQuestion > currentTime) {
-                sendDataToServer(yesData, noData, title)
+                sendDataToServer(yesData, noData, title,currentTime)
             } else {
                 location.reload()
             }
@@ -161,7 +98,7 @@
 
             setTimeout(function() {
                 clickElement('.style_order__book__top__3keFx');
-                setInterval(handleOrderBook, 500)
+                setInterval(handleOrderBook, 200)
             }, 1000);
         }, 1500);
     }, 3000);
