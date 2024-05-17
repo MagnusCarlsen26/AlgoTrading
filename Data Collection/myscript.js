@@ -1,4 +1,3 @@
-
 (function() {
     'use strict';
 
@@ -90,15 +89,15 @@
     var scriptElement = document.createElement('script');
     scriptElement.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js";
     document.head.appendChild(scriptElement);
-
+    var socket
     setTimeout(function() {
         clickElement(".style_arena__filter__item__3VlSl:nth-child(4)");    
         setTimeout(function() {
             clickElement('.style_event__card__actions__button__107m2.style_event__card__actions__button__yes__2V1x2');
-
+            socket = io('http://localhost:5000');
+            console.log(socket)
             setTimeout(function() {
                 clickElement('.style_order__book__top__3keFx');
-                const socket = io('http://localhost:5000');
 
                 setInterval(handleOrderBook, 200)
             }, 1000);
