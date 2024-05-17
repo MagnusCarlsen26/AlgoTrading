@@ -14,6 +14,7 @@ def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,base_directory 
             elif item.endswith('.csv'):
                 df = pd.read_csv(item_path)
                 x = strategy(df,stopLoss,bookprofit,buyCondition,sellCondition)
-                print(f'Overall Profit = {x}')
+                # print(f'Overall Profit = {x}')
                 profit += x
     print(f'Total Profit = {profit}')
+    return profit

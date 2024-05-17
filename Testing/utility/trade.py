@@ -27,7 +27,7 @@ def trade(df,stopLoss,bookprofit,buyCondition,sellCondition,toBuy=1,buyAmount=0,
                 buyAmount = buyCost
                 toBuy = 0
         else:
-            if sellCondition(lst,buyAmount):
+            if sellCondition(lst,buyAmount,bookprofit,stopLoss):
                 profit += min(0.5,buyCost - buyAmount)
                 toBuy = 1
                 buyAmount = 0

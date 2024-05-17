@@ -18,19 +18,3 @@ def buyCondition(lst):
     elif higherBuyQuantity/lowerBuy > ratio:
         return 1
     return 0
-
-l = []
-ratio = 18
-# for ratio in range(1,50,3):
-#     profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition)
-#     l.append(profit)
-for stopLoss in range(1,6):
-    profit = test(trade,stopLoss=stopLoss/2,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition)
-    l.append(profit)
-plt.plot(range(1,len(l)+1),l) # Use range(len(values)) for x-axis
-
-plt.xlabel("Index")
-plt.ylabel("Profit")
-plt.title("Line Chart")
-
-plt.show()
