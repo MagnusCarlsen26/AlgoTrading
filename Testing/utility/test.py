@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,base_directory = '../Data Collection/data'):
+def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay,base_directory = '../Data Collection/data'):
     directories_to_search = [base_directory]  
     profit = 0
     a = 0
@@ -13,9 +13,10 @@ def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,base_directory 
             if os.path.isdir(item_path):
                 directories_to_search.append(item_path)  
             elif item.endswith('.csv'):
+                # print(item_path)
                 df = pd.read_csv(item_path)
-                x = strategy(df,stopLoss,bookprofit,buyCondition,sellCondition)
-                # print(f'Overall Profit = {x}')
+                x = strategy(df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay)
+                print(f'Overall Profit = {x}')
                 profit += x
                 a += 1
     print(f'Total Profit = {profit}')

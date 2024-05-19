@@ -12,7 +12,9 @@ def sellCondition(df,request_number,buyAmount,bookprofit=0.5,stopLoss=1):
     return 0
 
 def buyCondition(df,request_number):
-    i = -5
+    global preCheck
+    preCheck = 5
+    i = -preCheck
     while i<0:
         i += 1
         lst = df.iloc[request_number+i].values
@@ -25,18 +27,24 @@ def buyCondition(df,request_number):
         return 0
     return 1
 
-l = []
-# ratio = 18
-for ratio in range(4,50,7):
-    profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition)
-    l.append(profit)
-# for stopLoss in range(1,6):
-# profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition)
-#     l.append(profit)
-plt.plot(range(1,len(l)+1),l) # Use range(len(values)) for x-axis
+x = []
+# for preCheck in range(0,5,5):
+for ratio in range(6,8,4):
+    profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=5,sellDelay=5)
+    x.append(profit)
+#     l.append(x)
+l = [x]
+xaxis = list(range(len(l[0])))  # [0, 1, 2, 3] in this example
+plt.figure(figsize=(10, 6))  # Optional: set figure size
 
-plt.xlabel("Index")
-plt.ylabel("Profit")
-plt.title("Line Chart")
+# Plot each line
+for i, row in enumerate(l):
+    plt.plot(xaxis, row, label=f"Line {i+1}")
+
+plt.xlabel("X-axis Label")
+plt.ylabel("Y-axis Label")
+plt.title("Multiple Line Chart from 2D Array")
+plt.grid(True)
+plt.legend()
 
 plt.show()
