@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 
-
 def checkdir(title):
     if not ( os.path.exists(title) and os.path.isdir(title) ):
         os.makedirs(title)
