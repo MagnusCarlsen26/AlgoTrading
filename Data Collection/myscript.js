@@ -99,7 +99,7 @@
             setTimeout(function() {
                 clickElement('.style_order__book__top__3keFx');
 
-                setInterval(handleOrderBook, 200)
+                setInterval(handleOrderBook, 100)
             }, 1000);
         }, 1500);
     }, 3000);
