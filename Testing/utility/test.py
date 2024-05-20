@@ -16,7 +16,7 @@ def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDe
                 # print(item_path)
                 df = pd.read_csv(item_path)
                 x = strategy(df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay)
-                print(f'Overall Profit = {x}')
+                # print(f'Overall Profit = {x}')
                 profit += x
                 a += 1
     print(f'Total Profit = {profit}')

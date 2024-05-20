@@ -13,8 +13,8 @@ def sellCondition(df,request_number,buyAmount,bookprofit=0.5,stopLoss=1):
 
 def buyCondition(df,request_number):
     global preCheck
-    preCheck = 5
-    i = -preCheck
+    prevCheck = 5
+    i = -prevCheck
     while i<0:
         i += 1
         lst = df.iloc[request_number+i].values
@@ -22,18 +22,21 @@ def buyCondition(df,request_number):
         higherBuyQuantity = findhigherBuy(lst,lowestIndex)
         if lowestIndex == -1 or higherBuyQuantity == 0:
             return 0
+        elif ignore<=buyCost<=ignore+1:
+            return 0
         elif higherBuyQuantity/lowerBuy > ratio:
             continue
         return 0
     return 1
 
-x = []
-# for preCheck in range(0,5,5):
-for ratio in range(6,8,4):
-    profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=5,sellDelay=5)
-    x.append(profit)
-#     l.append(x)
-l = [x]
+l = []
+for ignore in range(1,10):
+    x = []
+    for ratio in range(1,50,5):
+        profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=5,sellDelay=5)
+        x.append(profit)
+    l.append(x)
+    
 xaxis = list(range(len(l[0])))  # [0, 1, 2, 3] in this example
 plt.figure(figsize=(10, 6))  # Optional: set figure size
 
