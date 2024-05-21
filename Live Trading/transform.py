@@ -1,3 +1,5 @@
+from datetime import datetime
+import pandas as pd
 def transform(type,data,title,time):
     today = datetime.today()
     date = today.strftime("%Y-%m-%d")
@@ -7,7 +9,6 @@ def transform(type,data,title,time):
     while i<10:
         d[i] = 0
         i += 0.5
-        
     for i in range(len(data)):
         if data[i]['price'] !=  0:
             d[data[i]['price']] = data[i]['quantity']

@@ -16,26 +16,41 @@ def extractDate(data):
     return yes_data,no_data,title,time
 
 
-buy = 0
+buy = 1
+sell = 0
 @socketio.on('order_book_data')  
 def handle_order_book_data(data):
-    try:
-        yes_data, no_data, title, time = extractDate(data)
-        yesdf = transform('yes',data,title,time)
-        # nodf = transform('no',data,title,time)
+    global buy,sell
+    yes_data, no_data, title, time = extractDate(data)
+    yesdf = transform('yes',yes_data,title,time)
+    # nodf = transform('no',data,title,time)
+    print(buy,sell)
+    if buy and not sell:
+        print('Checking for buy')
+        x = exampleTradeBuy(yesdf)
+        if x:
+            buy = 0
+            socketio.emit('buy',x)
+    elif not buy and sell:
+        print('Checking for sell ')
+        x = exampleTradeSell(yesdf)
+        if x:
+            print('SELL')
+            buy = 1
+            socketio.emit('sell',x)
 
-        if buy:
-            x = exampleTradeSell(yesdf)
-            if x:
-                buy = 0
-                socketio.emit('trade',['sell',x])
-        else:
-            x = exampleTradeSell(yesdf)
-            if x:
-                buy = 1
-                socketio.emit('trade',['buy',x])
-    except Exception as e:
-        print("Error processing data:", e)
+
+@socketio.on('confirmBuy')
+def confirmBuy(data):
+    if data == 1:
+        sell = 1
+    print(buy,sell,'g')
+
+@socketio.on('confirmSell')
+def confirmSell(data):
+    if data == 1 :
+        sell = 0
+
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=6000)  
+    socketio.run(app, debug=True, port=8080)  
