@@ -91,7 +91,9 @@
     document.head.appendChild(scriptElement);
     var socket
     setTimeout(function() {
-        clickElement(".style_arena__filter__item__3VlSl:nth-child(4)");    
+        const elements = document.querySelectorAll('.style_event__card__wrapper__3sNug');
+
+        elements.forEach(element => { console.log(element) });  
         setTimeout(function() {
             clickElement('.style_event__card__actions__button__107m2.style_event__card__actions__button__yes__2V1x2');
             socket = io('http://localhost:5000');

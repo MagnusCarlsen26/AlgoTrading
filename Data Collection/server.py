@@ -23,5 +23,6 @@ def handle_order_book_data(data):
     except Exception as e:
         print("Error processing data:", e)
 
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)  # Use socketio.run()

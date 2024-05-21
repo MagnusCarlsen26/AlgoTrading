@@ -16,7 +16,8 @@ def save(type,data,title,time):
     while i<10:
         d[i] = 0
         i += 0.5
-        
+    print(data)
+    print()
     for i in range(len(data)):
         if data[i]['price'] !=  0:
             d[data[i]['price']] = data[i]['quantity']

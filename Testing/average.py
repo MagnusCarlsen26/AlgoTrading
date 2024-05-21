@@ -22,7 +22,7 @@ def buyCondition(df,request_number):
         higherBuyQuantity = findhigherBuy(lst,lowestIndex)
         if lowestIndex == -1 or higherBuyQuantity == 0:
             return 0
-        elif ignore<=buyCost<=ignore+1:
+        elif ignore<=buyCost<=ignore+2:
             return 0
         elif higherBuyQuantity/lowerBuy > ratio:
             continue
@@ -30,9 +30,9 @@ def buyCondition(df,request_number):
     return 1
 
 l = []
-for ignore in range(1,10):
+for ignore in range(0,10,2):
     x = []
-    for ratio in range(1,50,5):
+    for ratio in range(1,25,5):
         profit = test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=5,sellDelay=5)
         x.append(profit)
     l.append(x)
