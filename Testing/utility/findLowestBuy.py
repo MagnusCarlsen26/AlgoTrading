@@ -1,7 +1,16 @@
+'''
+
+Input  : Order-book without Time stamp.
+Output : Index for Buying , Quantity Available for Buying , Price of Buying
+
+'''
+import numpy as np
+
 def findLowestBuy(lst):
-    lowestIndex = -1
-    for i in range(19):
-        if lst[i] != 0:
-            lowestIndex = i
-            break
-    return lowestIndex,lst[lowestIndex],(lowestIndex+1)/2
+    nonzero_indices = np.nonzero(lst)[0] 
+    if nonzero_indices.size > 0:  
+        lowest_index = nonzero_indices[0] 
+        return lowest_index, lst[lowest_index], (lowest_index + 1) / 2
+    else:
+        return -1, 0, 0 
+

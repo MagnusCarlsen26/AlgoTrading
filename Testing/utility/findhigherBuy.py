@@ -1,9 +1,9 @@
-def findhigherBuy(lst,lowestIndex):
-    higherBuy = 0
-    eligible = 0
-    importance = [1,1,1,1,1]
-    for i in range(lowestIndex+1,19):
-        if lst[i] > 0:
-            eligible += 1
-            higherBuy += lst[i]*importance[eligible-1]
-    return higherBuy
+'''
+
+Input  : Order-book without Time stamp , Index for Buying , Weights array
+Output : Sum of weighted Buy Quantity higher than buy price 
+
+'''
+import numpy as np
+def findhigherBuy(lst,lowest_index):
+    return lst[lowest_index + 1 : lowest_index+6].sum()
