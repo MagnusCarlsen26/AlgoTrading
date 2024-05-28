@@ -26,7 +26,6 @@ def execute(target):
     time.sleep(0.75)
     pyautogui.click(1050,600,clicks=19,interval = 0.01)
     pyautogui.click(1175,600,clicks=int((target)*2),interval = 0.01)
-    pyautogui.click(1050,600,clicks=1,interval = 0.01)
 
     drag_and_drop(725,950,1200,950)
 

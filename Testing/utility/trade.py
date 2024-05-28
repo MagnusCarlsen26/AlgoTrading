@@ -32,16 +32,10 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
         else:
             if sellCondition(df,request_number,costPrice,bookprofit,stopLoss):
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+sellDelay].values)
-                if buyCost - costPrice > bookprofit:
-                    # print(f'Profit in {lst}')
-                    madeProfit += 1
-                    profit += bookprofit
-                elif buyCost - costPrice <= -stopLoss:
-                    # print(f'Loss in {lst}')
-                    madeLoss -= 1
-                    profit += -stopLoss
+                if buyCost - costPrice > 0:
+                    profit += min(bookprofit,(buyCost-0.5)-costPrice)
                 else:
-                    continue
+                    profit += max(-stopLoss,(buyCost-0.5) - costPrice)
                 toBuy = 1
                 costPrice = 0
     # print(f'Made Profit = {madeProfit} , Made Loss = {madeLoss}')

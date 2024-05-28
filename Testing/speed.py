@@ -20,7 +20,7 @@ def buyCondition(df,request_number):
     elif ignore<=currbuyCost<=ignore+2:
         return 0
     elif higherBuyQuantity/currlowerBuy > ratio:
-        if currbuyCost == prevbuyCost :
+        if currbuyCost <= prevbuyCost :
             # print(prevlowerBuy,currlowerBuy)
             if prevlowerBuy - currlowerBuy > cutoff:
                 return 1
