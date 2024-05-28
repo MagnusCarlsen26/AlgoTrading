@@ -35,7 +35,7 @@ def execute(target):
 st.title('Intraday Trading Dashboard')
 selected_value = None
 
-col1, col2 = st.columns(2)  # Create two columns for better arrangement
+col1, col2 = st.columns(2)  
 
 with col1:
     for value in range(1,11):

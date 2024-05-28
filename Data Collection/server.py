@@ -14,7 +14,7 @@ def extractDate(data):
     time = data.get('currentTime')
     return yes_data,no_data,title,time
 
-@socketio.on('order_book_data')  # New Socket.IO event handler
+@socketio.on('order_book_data') 
 def handle_order_book_data(data):
     try:
         yes_data, no_data, title, time = extractDate(data)
@@ -25,4 +25,4 @@ def handle_order_book_data(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5000)  # Use socketio.run()
+    socketio.run(app, debug=True, port=5000)  

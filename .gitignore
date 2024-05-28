@@ -1,5 +1,10 @@
 Data Collection/data/
 Data Collection/prePrcessedData/
 Data Collection/analysis/
+Data Collection/Bitcoin Daily/
 
-__pycache__
+Data Collection/__pycache__
+Live Trading/__pycache__
+Manual Trading/__pycache__
+Testing/utility/__pycache__
+
