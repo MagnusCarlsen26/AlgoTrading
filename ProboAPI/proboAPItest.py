@@ -2,11 +2,14 @@ import requests
 from dotenv import load_dotenv
 import os
 import time
-
+from save import save
+from time import gmtime, strftime
+import timeit
 load_dotenv()
 
 authorization = os.environ.get('Authorization_Dummy') 
 url = 'https://prod.api.probo.in/api/'
+bitcoinEventId = [2449]
 
 def fetch( endpoint: str , headers: dict , data: dict , method  ) :
     new_url = url + endpoint
@@ -28,7 +31,7 @@ def fetch( endpoint: str , headers: dict , data: dict , method  ) :
         print(f'Error : {response.status_code}')
         print(response.text)
 
-def buy( eventId : int , buy_price : float , yesno , stop_loss , bookprofit , quantity ) :
+def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -> int :
     endpoint = 'v1/oms/order/initiate'
     headers = {
         "accept": "*/*",
@@ -56,7 +59,7 @@ def buy( eventId : int , buy_price : float , yesno , stop_loss , bookprofit , qu
     print(f'order ID : {order_id}')
     return order_id
 
-def buyBook(eventId):
+def buyBook( eventId : int ) -> dict :
     global headers3
     endpoint = 'v3/tms/trade/bestAvailablePrice'
     headers = {
@@ -85,11 +88,13 @@ def buyBook(eventId):
     data = fetch( endpoint , headers , data , 'GET')
 
     ltp = data['ltp']
-    buy = data['available_qty']['buy']
-    sellBook = data['available_qty']['sell']
-    print(sellBook)
+    buyData = data['available_qty']['buy']
+    sellData = data['available_qty']['sell']
+    title = data['event_details']['event_name']
 
-def sell(sell_price , order_id):
+    return { 'ltp' : ltp , 'buyData' : buyData  , 'sellData' : sellData , 'title' : title}
+
+def sell( sell_price : float, order_id : int ) :
     endpoint = 'v2/oms/order/exit'
     headers = {
         "accept": "*/*",
@@ -167,8 +172,70 @@ def trade_status(eventId : int , order_id: int):
     available_qty = data['records']['availableQty']
     print(available_qty)
 
-eventId = 2640147
+def getEventIds( topicIds : list[int] ) :
+    endpoint = 'v1/product/arena/events/v2'
+    headers = {
+        "accept": "*/*",
+        "accept-language": "en",
+        "appid": "in.probo.pro",
+        "authorization": authorization,
+        "content-type": "application/json",
+        "origin": "https://trading.probo.in",
+        "priority": "u=1, i",
+        "referer": "https://trading.probo.in/",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "x-device-os": "ANDROID",
+        "x-version-name": "10",
+    }
+    data = {
+        "page": 1,
+        "categoryIds": [],
+        "topicIds": topicIds,
+        "eventIds": [],
+        "followedOnly": False,
+        "filter": {}
+    }
+    data = fetch( endpoint , headers , data , 'POST')['records']['events']
+    return [ d['id'] for d in data ]
 
-while(True):
-    buyBook(eventId)
-    time.sleep(1)
+def collectData( topicId : int ) :
+    while True:
+        eventId = getEventIds(topicId)[0]
+        while True :
+            d = buyBook(eventId)
+            if d['buyData'] == {} :
+                break
+            save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) )
+            save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) )
+
+def buyAlgorithm( buyBook : dict ) :
+    pass
+
+def sellAlgorithm( buyBook : dict ) :
+    pass
+
+def trade( topicId : int ) :
+    while True:
+        eventId = getEventIds(topicId)[0]
+        isToBuy = True
+        while True :
+            d = buyBook(eventId)
+            if d['buyData'] == {}:
+                break
+            if isToBuy :
+                if buyAlgorithm(d['buyData']) :
+                    buy( eventId = eventId , buy_price = buy_price ,  yesno = 'yes' )
+                    # CHECK TRADE STATUS
+                    isToBuy = 0
+            else :
+                if sellAlgorithm(buyBook) :
+                    # INSTANT MATCH LOGIC
+                    isToBuy = 1
+                
+collectData([2449])
