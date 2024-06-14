@@ -9,12 +9,7 @@ def findLowestBuy(lst):
         return -1, 0, 0 
 
 def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay,toBuy=1,costPrice=0,profit=0,request_number=5,time=120):
-    global total_profit
-    madeProfit = 0
-    madeLoss = 0
-    # print(item_path)
     while request_number < len(df)-1-sellDelay:
-        request_number += 1
         lst = df.iloc[request_number].values
         lst = np.array(lst[:len(lst)-1])
         lowestIndex,lowerBuy,buyCost = findLowestBuy(lst)
@@ -23,9 +18,7 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
             if request_number > len(df) - time*10:
                 break
             if buyCondition(df,request_number):
-                # print()
-                # print(f'prev    {df.iloc[request_number -10].values}')
-                # print(f'Buying  {lst}')
+                buyIndex = request_number
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+buyDelay].values)
                 costPrice = buyCost
                 toBuy = 0
@@ -33,12 +26,15 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
             if sellCondition(df,request_number,costPrice,bookprofit,stopLoss):
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+sellDelay].values)
                 if buyCost - costPrice > 0:
+                    # print(f'Profit = {bookprofit}')
                     profit += min(bookprofit,(buyCost-0.5)-costPrice)
                 else:
+                    # print(f'Loss = {-stopLoss}')
                     profit += max(-stopLoss,(buyCost-0.5) - costPrice)
                 toBuy = 1
                 costPrice = 0
-    # print(f'Made Profit = {madeProfit} , Made Loss = {madeLoss}')
-    # print('----------------------------------------------')
+        request_number += 1
+    if costPrice != 0:
+        print(f'Waste = {costPrice} , {item_path} , {buyIndex}')
     profit = profit - costPrice
     return profit

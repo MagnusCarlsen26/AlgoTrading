@@ -5,11 +5,18 @@ from utility.findhigherBuy  import findhigherBuy
 import matplotlib.pyplot as plt
 import numpy as np
 
-def sellCondition(df,request_number,buyAmount,bookprofit=0.5,stopLoss=1):
-    return 1
+def sellCondition(df,request_number,costPrice,bookprofit=0.5,stopLoss=1):
+    lst = df.iloc[request_number].values
+    lst = np.array(lst[:len(lst)-1])
+    lowestIndex,lowerBuy,buyCost = findLowestBuy(lst)
+
+    if buyCost - costPrice > bookprofit:
+        return 1
+    elif buyCost - costPrice <= -stopLoss :
+        return 1
+    return 0
 
 def buyCondition(df,request_number):
-    global preCheck
     prevCheck = 5
     i = -prevCheck
     prevbuyCost = 0
@@ -22,22 +29,23 @@ def buyCondition(df,request_number):
         higherBuyQuantity = findhigherBuy(lst,lowestIndex)
         if lowestIndex == -1 :
             return 0
-        elif ignore<=buyCost<=ignore+2:
-            return 0
-        elif higherBuyQuantity/lowerBuy > ratio:
+        for ig in ignore:
+            if ig<=buyCost<=ig+2:
+                return 0
+        if higherBuyQuantity/lowerBuy > ratio:
             continue
         return 0
     return 1
 
-ignore = 9
-ratio = 112
+ignore = [0,9]
+ratio = 10
 profit = []
 ratios = []
 # for ratio in range(100,120,2):
-profit.append(test(trade,stopLoss=1,bookprofit=0.5,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=0,sellDelay=0))
-    # ratios.append(ratio)
+profit.append(test(trade,stopLoss=2,bookprofit=2,buyCondition = buyCondition,sellCondition = sellCondition,buyDelay=0,sellDelay=0))
+    # ratios.append(ratio)2
     # print(profit)
-plt.plot(ratios,profit)
-plt.xlabel('ratios')
-plt.ylabel('profit')
-plt.show()
+# plt.plot(ratios,profit)
+# plt.xlabel('ratios')
+# plt.ylabel('profit')
+# plt.show()

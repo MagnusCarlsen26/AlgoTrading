@@ -1,10 +1,11 @@
 Data Collection/data/
 Data Collection/prePrcessedData/
 Data Collection/analysis/
-Data Collection/Bitcoin Daily/
+Data Collection/Bicoin Daily/
 
 Data Collection/__pycache__
 Live Trading/__pycache__
 Manual Trading/__pycache__
 Testing/utility/__pycache__
 
+.env
