@@ -3,10 +3,16 @@ from dotenv import load_dotenv
 import os
 from save import save
 from time import gmtime, strftime
+import random
+import time
+import websocket
+import json
+import threading
+import queue
 
 load_dotenv()
 
-authorization = os.environ.get('Authorization_Real') 
+authorization = os.environ.get('Authorization_Dummy') 
 url = 'https://prod.api.probo.in/api/'
 bitcoinEventId = [2449]
 
@@ -30,9 +36,9 @@ def fetch( endpoint: str , headers: dict , data: dict , method  ) :
         else :
             print(f'Error : {response.status_code}')
             print(response.text)
-    except :
+    except NameError as e:
         print('Error Occured')
-        return fetch( endpoint , headers , data , method )
+        fetch(endpoint , headers , data, method )
 
 def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -> int :
     endpoint = 'v1/oms/order/initiate'
@@ -58,7 +64,6 @@ def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -
 
     data = fetch( endpoint , headers , data , 'POST')
     order_id = data['id']
-    print(f'order ID : {order_id}')
     return order_id
 
 def buyBook( eventId : int ) -> dict :
@@ -128,7 +133,6 @@ def cancel_order(event_id, order_id, ):
     }
 
     response = fetch(endpoint, headers, data, 'PUT')
-    print(response)
 
 def sell( sell_price : float, order_id : int ) :
     endpoint = 'v2/oms/order/exit'
@@ -201,9 +205,10 @@ def trade_status(eventId : int , order_id: int):
                     return 'Matched'
                 elif status == 'Exited Orders' :
                     return f'Exited {tr['profit']}'
-                else:
-                    print(status)
-                return
+                elif status == 'Cancelled Orders':
+                    return 'Cancelled'   
+                elif status == 'Exiting Orders':
+                    return 'Exiting'
 
     available_qty = data['records']['availableQty']
     print(available_qty)
@@ -240,43 +245,112 @@ def getEventIds( topicIds : list[int] ) :
     data = fetch( endpoint , headers , data , 'POST')['records']['events']
     return [ d['id'] for d in data ]
 
-def collectData( topicId : int ) :
+def collectData( topicId : int , q ) :
     while True:
         eventId = getEventIds(topicId)[0]
         while True :
             d = buyBook(eventId)
+            print('GEFG',d)
             if d['buyData'] == {} :
                 break
-            save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) )
-            save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) )
+            save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) , q.get() )
+            save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) , q.get() )
 
 def buyAlgorithm( buyBook : dict ) :
-    pass
+    x = random.random()
+    if x < 0.8 :
+        return 0
+    else:
+        return 9.6
 
 def sellAlgorithm( buyBook : dict ) :
-    pass
+    x = random.random()
+    if x < 0.5 :
+        return 0
+    else:
+        return 1
 
-def trade( topicId : int , stoploss : float) : 
+def trade( topicId : list[int] , stoploss : float) : 
     while True:
         eventId = getEventIds(topicId)[0]
         isToBuy = True
+        print(f"eventId = {eventId}")
         while True :
             d = buyBook(eventId)
             if d['buyData'] == {}:
                 break
             if isToBuy :
-                if buyAlgorithm(d['buyData']) :
-                    buy_price = buyAlgorithm(d['buyData'])
+                print("Analyzing to Buy...")
+                buy_price = buyAlgorithm(d['buyData'])
+                if  buy_price:
+                    print(f"Buying at {buy_price}.")
                     order_id = buy( eventId = eventId , buy_price = buy_price ,  yesno = 'yes' )
+                    time.sleep(0.5)
                     status = trade_status(eventId=eventId , order_id=order_id)
                     if status == 'Pending' :
-                        while status != 'Matched':
+                        print("Order didn't match, cancelling it.")
+                        while status != 'Cancelled':
                             cancel_order(eventId,order_id)
                             status = trade_status(eventId,order_id)
-                        sell( buy_price + stoploss , order_id)
-                    isToBuy = 0
+                        print("Order Cancelled")
+                    elif status == 'Matched':
+                        sell( min(buy_price + stoploss,9.5) , order_id)
+                        isToBuy = 0
+                    else:
+                        print(f"STATUS = {status}.............")
             else :
+                print("Analyzing for selling...")
                 if sellAlgorithm(buyBook) :
+                    cancel_order(eventId,order_id)
                     sell(0.5 , order_id)
-                    profit = int(trade_status(eventId,order_id).split()[-1])
+                    time.sleep(0.5)
+                    profit = (trade_status(eventId,order_id).split()[-1])
+                    print(f"Order sold, profit = {profit}")
                     isToBuy = 1
+            time.sleep(5)
+
+def getBitcoinPrice(q) :
+
+    def on_message(ws,message):
+        data = json.loads(message)
+
+        if data.get("t") == "d" and data.get("d", {}).get("b", {}).get("p") == "crypto/btcusdt":
+            currBitcoinPrice = data["d"]["b"]["d"]["closePrice"]
+            q.put(currBitcoinPrice)
+
+    def on_error(ws,error) :
+        print(f"Error: {error}")
+
+    def on_close(ws,close_status_code, close_msg):
+        print(f"Closed with status {close_status_code}: {close_msg}")
+
+    def on_open(ws):
+        subscription_request = {
+            "t": "d",
+            "d": {
+                "r": 2,  
+                "a": "q", 
+                "b": {
+                    "p": "crypto/btcusdt",  
+                    "h": ""  
+                }
+            }
+        }
+        ws.send(json.dumps(subscription_request))
+
+    ws_app = websocket.WebSocketApp(
+        "wss://s-apse1a-nss-6013.asia-southeast1.firebasedatabase.app/.ws?v=5&p=1:530071772200:web:38ba8735b6fd3ff69a291d&ns=prod-probo-realtime-db-2",
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close
+    )
+
+    ws_app.on_open = on_open
+    ws_app.run_forever(ping_interval=30, ping_timeout=10)  
+
+q = queue.Queue()
+bitcoinThread = threading.Thread(target=getBitcoinPrice , args =(q,))
+collectDataThread = threading.Thread(target=collectData , args=(bitcoinEventId,q,))
+
+collectDataThread.start()
+bitcoinThread.start()

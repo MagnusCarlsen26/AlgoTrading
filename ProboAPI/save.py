@@ -6,16 +6,17 @@ def checkdir(title):
     if not ( os.path.exists(title) and os.path.isdir(title) ):
         os.makedirs(title)
 
-def save(type,transposed_data,title,time):
+def save(type,transposed_data,title,time,currBitcoinPrice):
     today = datetime.today()
     date = today.strftime("%Y-%m-%d")
 
     title = 'Bitcoin/' +str(date) + '/' +title
-    transposed_data['time'] = time
+    transposed_data['time'] = time 
+    transposed_data['currBitcoinPrice'] = currBitcoinPrice 
     transposed_data = {k: [v] for k, v in transposed_data.items()} 
 
     df = pd.DataFrame(transposed_data)
-
+    print("SAVING...")
     try:
         df.to_csv(f'{date}/{title}/{type}.csv', mode='a', index=True, header=False)  
     except:
