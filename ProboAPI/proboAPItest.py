@@ -1,35 +1,38 @@
 import requests
 from dotenv import load_dotenv
 import os
-import time
 from save import save
 from time import gmtime, strftime
-import timeit
+
 load_dotenv()
 
-authorization = os.environ.get('Authorization_Dummy') 
+authorization = os.environ.get('Authorization_Real') 
 url = 'https://prod.api.probo.in/api/'
 bitcoinEventId = [2449]
 
 def fetch( endpoint: str , headers: dict , data: dict , method  ) :
     new_url = url + endpoint
     
-    if method == 'POST' : 
-        response = requests.post( new_url , headers = headers , json = data )
-    elif method == 'GET': 
-        response = requests.get( new_url , headers = headers , params = data )
-    elif method == 'PUT' :
-        response = requests.put( new_url , headers = headers , json = data )
+    try:
+        if method == 'POST' : 
+            response = requests.post( new_url , headers = headers , json = data )
+        elif method == 'GET': 
+            response = requests.get( new_url , headers = headers , params = data )
+        elif method == 'PUT' :
+            response = requests.put( new_url , headers = headers , json = data )
 
-    if response.status_code == 200 :
-        response = response.json()
-        if response['isError'] :
-            print('ERROR : ' , response['message'])
-        else : 
-            return response['data']
-    else :
-        print(f'Error : {response.status_code}')
-        print(response.text)
+        if response.status_code == 200 :
+            response = response.json()
+            if response['isError'] :
+                print('ERROR : ' , response['message'])
+            else : 
+                return response['data']
+        else :
+            print(f'Error : {response.status_code}')
+            print(response.text)
+    except :
+        print('Error Occured')
+        return fetch( endpoint , headers , data , method )
 
 def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -> int :
     endpoint = 'v1/oms/order/initiate'
@@ -54,13 +57,11 @@ def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -
     }
 
     data = fetch( endpoint , headers , data , 'POST')
-
-    order_id = data['order_id']
+    order_id = data['id']
     print(f'order ID : {order_id}')
     return order_id
 
 def buyBook( eventId : int ) -> dict :
-    global headers3
     endpoint = 'v3/tms/trade/bestAvailablePrice'
     headers = {
         "accept": "*/*",
@@ -87,12 +88,47 @@ def buyBook( eventId : int ) -> dict :
     }
     data = fetch( endpoint , headers , data , 'GET')
 
-    ltp = data['ltp']
-    buyData = data['available_qty']['buy']
-    sellData = data['available_qty']['sell']
-    title = data['event_details']['event_name']
+    try:
+        ltp = data['ltp']
+        buyData = data['available_qty']['buy']
+        sellData = data['available_qty']['sell']
+        title = data['event_details']['event_name']
 
-    return { 'ltp' : ltp , 'buyData' : buyData  , 'sellData' : sellData , 'title' : title}
+        return { 'ltp' : ltp , 'buyData' : buyData  , 'sellData' : sellData , 'title' : title}
+    except TypeError as e :
+        print(e)
+        print(data)
+
+def cancel_order(event_id, order_id, ):
+    endpoint = f"v1/oms/order/cancel/{order_id}?eventId={event_id}"
+    headers = {
+        "accept": "*/*",
+        "accept-language": "en",
+        "appid": "in.probo.pro",
+        "authorization": authorization, # Parameterized auth token
+        "content-type": "application/json",
+        "origin": "https://trading.probo.in",
+        "priority": "u=1, i",
+        "referer": "https://trading.probo.in/",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "x-device-os": "ANDROID",
+        "x-version-name": "10",
+    }
+    data = {
+        "investment_visible": 0.5,
+        "quantity_visible": 1,
+        "request_type": "cancel",
+        "quantity_to_cancel": 1
+    }
+
+    response = fetch(endpoint, headers, data, 'PUT')
+    print(response)
 
 def sell( sell_price : float, order_id : int ) :
     endpoint = 'v2/oms/order/exit'
@@ -160,11 +196,11 @@ def trade_status(eventId : int , order_id: int):
             if tr['order_id'] == order_id :
                 status = trade['sectionTitle']
                 if status == 'Pending Orders' :
-                    print('Order is pending.')
+                    return 'Pending'
                 elif status == 'Matched Orders' :
-                    print('Order is delivered.')
+                    return 'Matched'
                 elif status == 'Exited Orders' :
-                    print('Order is Exited.')
+                    return f'Exited {tr['profit']}'
                 else:
                     print(status)
                 return
@@ -220,7 +256,7 @@ def buyAlgorithm( buyBook : dict ) :
 def sellAlgorithm( buyBook : dict ) :
     pass
 
-def trade( topicId : int ) :
+def trade( topicId : int , stoploss : float) : 
     while True:
         eventId = getEventIds(topicId)[0]
         isToBuy = True
@@ -230,12 +266,17 @@ def trade( topicId : int ) :
                 break
             if isToBuy :
                 if buyAlgorithm(d['buyData']) :
-                    buy( eventId = eventId , buy_price = buy_price ,  yesno = 'yes' )
-                    # CHECK TRADE STATUS
+                    buy_price = buyAlgorithm(d['buyData'])
+                    order_id = buy( eventId = eventId , buy_price = buy_price ,  yesno = 'yes' )
+                    status = trade_status(eventId=eventId , order_id=order_id)
+                    if status == 'Pending' :
+                        while status != 'Matched':
+                            cancel_order(eventId,order_id)
+                            status = trade_status(eventId,order_id)
+                        sell( buy_price + stoploss , order_id)
                     isToBuy = 0
             else :
                 if sellAlgorithm(buyBook) :
-                    # INSTANT MATCH LOGIC
+                    sell(0.5 , order_id)
+                    profit = int(trade_status(eventId,order_id).split()[-1])
                     isToBuy = 1
-                
-collectData([2449])
