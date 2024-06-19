@@ -24,4 +24,5 @@ def clean(base_directory = './Bitcoin'):
                     return row
                 df = df.apply(lambda row: your_function(row), axis=1)
                 df.to_csv(item_path,index=False)
+                
 clean()

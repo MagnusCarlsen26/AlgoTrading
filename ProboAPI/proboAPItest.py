@@ -5,16 +5,19 @@ from save import save
 from time import gmtime, strftime
 import random
 import time
-import websocket
 import json
+from datetime import datetime,timezone
+import websocket
 import threading
-import queue
+import subprocess
 
 load_dotenv()
 
-authorization = os.environ.get('Authorization_Dummy') 
+authorization_dummy = os.environ.get('Authorization_Dummy') 
+authorization_real = os.environ.get('Authorization_Real')
 url = 'https://prod.api.probo.in/api/'
-bitcoinEventId = [2449]
+with open('config.json','r') as f:
+    config = json.load(f)
 
 def fetch( endpoint: str , headers: dict , data: dict , method  ) :
     new_url = url + endpoint
@@ -42,18 +45,8 @@ def fetch( endpoint: str , headers: dict , data: dict , method  ) :
 
 def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -> int :
     endpoint = 'v1/oms/order/initiate'
-    headers = {
-        "accept": "*/*",
-        "appid": "in.probo.pro",
-        "authorization": authorization,
-        "content-type": "application/json",
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10"
-    }
-
+    headers = config["buy"]
+    headers["authorization"] = authorization_real
     data = {
         "event_id" : eventId,
         "offer_type" : 'buy' if yesno == 'yes' else 'sell',
@@ -68,26 +61,8 @@ def buy( eventId : int , buy_price : float , yesno : str , quantity : int = 1) -
 
 def buyBook( eventId : int ) -> dict :
     endpoint = 'v3/tms/trade/bestAvailablePrice'
-    headers = {
-        "accept": "*/*",
-        "accept-language": "en",
-        "appid": "in.probo.pro",
-        "authorization": authorization,
-        "content-type": "application/json",
-        "if-none-match": 'W/"217c-77YJofEzYutmC1wBp1K0t2omdrk"',
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "sec-ch-ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Windows"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10",
-    }
+    headers = config["buyBook"]
+    headers["authorization"] = authorization_dummy
     data = {
         'eventId' : eventId
     }
@@ -104,27 +79,10 @@ def buyBook( eventId : int ) -> dict :
         print(e)
         print(data)
 
-def cancel_order(event_id, order_id, ):
+def cancel_order(event_id : int, order_id : int ):
     endpoint = f"v1/oms/order/cancel/{order_id}?eventId={event_id}"
-    headers = {
-        "accept": "*/*",
-        "accept-language": "en",
-        "appid": "in.probo.pro",
-        "authorization": authorization, # Parameterized auth token
-        "content-type": "application/json",
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10",
-    }
+    headers = config["cancel_order"]
+    headers["authorization"] = authorization_real
     data = {
         "investment_visible": 0.5,
         "quantity_visible": 1,
@@ -136,25 +94,8 @@ def cancel_order(event_id, order_id, ):
 
 def sell( sell_price : float, order_id : int ) :
     endpoint = 'v2/oms/order/exit'
-    headers = {
-        "accept": "*/*",
-        "accept-language": "en",
-        "appid": "in.probo.pro",
-        "authorization": authorization,
-        "content-type": "application/json",
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10",
-    }
+    headers = config["sell"]
+    headers["authorization"] = authorization_real
     data = {
     "exit_params": [
             {
@@ -168,26 +109,8 @@ def sell( sell_price : float, order_id : int ) :
 def trade_status(eventId : int , order_id: int):
 
     endpoint = 'v2/tms/trade/userTradesPerEvent'
-    headers = {
-        "accept": "*/*",
-        "accept-language": "en",
-        "appid": "in.probo.pro",
-        "authorization": authorization,
-        "content-type": "application/json",
-        "if-none-match": "W/\"16cf-LwV2VgqKZSt/oiMASyJg+AssC8c\"",
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10",
-    }
+    headers = config["trade_status"]
+    headers["authorization"] = authorization_real
     data = {
         'eventId' : eventId
     }
@@ -215,25 +138,8 @@ def trade_status(eventId : int , order_id: int):
 
 def getEventIds( topicIds : list[int] ) :
     endpoint = 'v1/product/arena/events/v2'
-    headers = {
-        "accept": "*/*",
-        "accept-language": "en",
-        "appid": "in.probo.pro",
-        "authorization": authorization,
-        "content-type": "application/json",
-        "origin": "https://trading.probo.in",
-        "priority": "u=1, i",
-        "referer": "https://trading.probo.in/",
-        "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-        "x-device-os": "ANDROID",
-        "x-version-name": "10",
-    }
+    headers = config["getEventIds"]
+    headers["authorization"] = authorization_dummy
     data = {
         "page": 1,
         "categoryIds": [],
@@ -244,17 +150,6 @@ def getEventIds( topicIds : list[int] ) :
     }
     data = fetch( endpoint , headers , data , 'POST')['records']['events']
     return [ d['id'] for d in data ]
-
-def collectData( topicId : int , q ) :
-    while True:
-        eventId = getEventIds(topicId)[0]
-        while True :
-            d = buyBook(eventId)
-            print('GEFG',d)
-            if d['buyData'] == {} :
-                break
-            save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) , q.get() )
-            save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') ,  strftime("%Y-%m-%d %H:%M:%S", gmtime()) , q.get() )
 
 def buyAlgorithm( buyBook : dict ) :
     x = random.random()
@@ -309,14 +204,26 @@ def trade( topicId : list[int] , stoploss : float) :
                     isToBuy = 1
             time.sleep(5)
 
-def getBitcoinPrice(q) :
+def collectData( topicId : list[int] ) :
+    while True:
+        eventId = getEventIds([topicId])[0]
+        while True :
+            d = buyBook(eventId)
+            if d['buyData'] == {} :
+                break
+            save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Bitcoin' )
+            save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Bitcoin' )
+
+def collectBitcoinPrice() :
 
     def on_message(ws,message):
         data = json.loads(message)
 
         if data.get("t") == "d" and data.get("d", {}).get("b", {}).get("p") == "crypto/btcusdt":
             currBitcoinPrice = data["d"]["b"]["d"]["closePrice"]
-            q.put(currBitcoinPrice)
+            with open("output.txt" , "w") as file:
+                file.write(currBitcoinPrice)
+            # save( price = currBitcoinPrice , time =  datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , fileOrigin='BitcoinPrice' )
 
     def on_error(ws,error) :
         print(f"Error: {error}")
@@ -348,9 +255,8 @@ def getBitcoinPrice(q) :
     ws_app.on_open = on_open
     ws_app.run_forever(ping_interval=30, ping_timeout=10)  
 
-q = queue.Queue()
-bitcoinThread = threading.Thread(target=getBitcoinPrice , args =(q,))
-collectDataThread = threading.Thread(target=collectData , args=(bitcoinEventId,q,))
+thread1 = threading.Thread(target=collectBitcoinPrice, args=())
+thread2 = threading.Thread(target=collectData, args=([2449]))
 
-collectDataThread.start()
-bitcoinThread.start()
+thread1.start()
+thread2.start()
