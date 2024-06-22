@@ -1,7 +1,7 @@
 import requests
 from dotenv import load_dotenv
 import os
-from save import save
+from utility.save import save
 from time import gmtime, strftime
 import random
 import time
