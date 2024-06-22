@@ -13,7 +13,11 @@ def save(type,transposed_data,title,time,fileOrigin):
     title = fileOrigin + '/' +str(date) + '/' +title
     transposed_data['time'] = time 
     with open("output.txt", "r") as file :
-        bitcoinPrice = float(file.read().strip())
+        try:
+            bitcoinPrice = float(file.read().strip())
+        except ValueError as e:
+            print(f"save : error : {e}")
+            return
     transposed_data["bitcoinPrice"] = bitcoinPrice
     transposed_data = {k: [v] for k, v in transposed_data.items()} 
     df = pd.DataFrame(transposed_data)
