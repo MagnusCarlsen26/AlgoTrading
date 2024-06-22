@@ -1,0 +1,3 @@
+### ISSUE 1
+
+2024-06-22 22:03:01,973 - INFO - Question : Bitcoin to be priced at 64300.49 USDT or more at 10:10 PM?
