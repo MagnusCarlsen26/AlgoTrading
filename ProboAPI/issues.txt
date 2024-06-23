@@ -44,3 +44,7 @@
 2024-06-22 22:06:26,485 - INFO - Difference = 20.5
 2024-06-22 22:06:26,485 - INFO - Buying yes for 5.5...
 2024-06-22 22:06:27,071 - INFO - Analyzing for selling...
+
+### ISSUE 2
+
+Error handling and confirmation in utility/api.py sell() and cancel_order() is pending
