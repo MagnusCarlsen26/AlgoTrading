@@ -1,28 +1,25 @@
 import time
 import threading
+from typing import Literal
 from utility.api import buy,buyBook,cancel_order,sell,trade_status,getBuyPrice,collectBitcoinPrice,collectData
 from utility.abort import abort
 from utility.smartQuestionSelector import smartQuestionSelector
+from utility.readBitcoinPrice import readBitcoinPrice
+from utility.sendEmail import sendEmail
 import logging
-from pydub import AudioSegment
-from pydub.playback import play
+import traceback
 
-prevBitcoinPrice = None
-logging.basicConfig(filename='trade_log.txt', level=logging.INFO,filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    filename='trade_log.txt', 
+    level=logging.INFO,
+    filemode='w', 
+    format='%(asctime)s.%(msecs)03d - %(levelname)s - %(threadName)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
-    global prevBitcoinPrice
-    with open("output.txt", "r") as file :
-        try:
-            currBitcoinPrice = float(file.read().strip())
-        except ValueError as e:
-            return 0
 
-    if prevBitcoinPrice == None :
-        prevBitcoinPrice = currBitcoinPrice
-        return 0
-    
-    diff = currBitcoinPrice - prevBitcoinPrice
+    diff = readBitcoinPrice()
 
     if diff >= 1 :
         currPrice = getBuyPrice( buyBook )
@@ -32,30 +29,19 @@ def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
         factor = -1
     else:
         return 0
+    
     for ignore in ignores:
         if ignore <= currPrice <= ignore + 2:
             return 0
-    if abs(diff) >= 5 :
-        logging.debug(f"TRADE SHOULD HAPPEN difference = {diff}")
+        
     if factor*diff >= bitcoinPriceDiff :
         logging.info(f"Difference = {diff}")
         return factor*currPrice
     return 0
 
-def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType : str) -> bool :
-    global prevBitcoinPrice
-    with open("output.txt", "r") as file :
-        try:
-            currBitcoinPrice = float(file.read().strip())
-        except ValueError as e:
-            print(f"save : error : {e}")
-            return 0
-        
-    if prevBitcoinPrice == None :
-        prevBitcoinPrice = currBitcoinPrice
-        return 0
-    
-    diff = currBitcoinPrice - prevBitcoinPrice
+def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType : Literal['yes','no']) -> bool :
+
+    diff = readBitcoinPrice()
     
     if orderType == 'yes' :
         currPrice = getBuyPrice(buyBook)
@@ -65,13 +51,20 @@ def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType :
         factor = 1
     
     if factor*diff > bitcoinPriceDiff:
-        logging.info(f"Difference = {diff}")
+        logging.info(f"Selling because difference = {diff}.")
         return True
     if buyPrice - (currPrice - 0.5) >= stoploss :
+        logging.info(f"Selling because of stoploss.")
         return True
     return False    
 
 def trade( topicId : list[int] ) : 
+    while True :
+        with open("output.txt") as f:
+            x = f.read()
+            if x != "":
+                break
+        time.sleep(0.5)
     try:
         while True:
             eventId = smartQuestionSelector(topicId)
@@ -87,6 +80,7 @@ def trade( topicId : list[int] ) :
                     if buy_price != 0:
                         orderType = 'yes' if buy_price > 0 else 'no'
                         buy_price = abs(buy_price)
+                        # SEND EMAIL
                         logging.info(f"Buying {orderType} for {buy_price}...")
                         order_id = buy( eventId , buy_price , orderType )
                         time.sleep(0.2)
@@ -106,6 +100,7 @@ def trade( topicId : list[int] ) :
                 else :
                     if 'Exited' in trade_status(eventId,order_id):
                         profit = (trade_status(eventId,order_id).split()[-1])
+                        # SEND EMAIL
                         logging.info(f"Order sold, profit = {profit}")
                         isToBuy = True
                         logging.info("Analyzing to Buy...")
@@ -119,12 +114,11 @@ def trade( topicId : list[int] ) :
                         isToBuy = True
                         logging.info("Analyzing to Buy...")
                 # time.sleep(5)
-    except Exception as e:
+    except Exception as e:  
+        sendEmail("Algorithm has crashed.")
         logging.exception(f"ERROR {e}")
-        sound = AudioSegment.from_file("alert.mp3", format="mp3")
-        play(sound)
-
-        exit()
+        traceback.print_exc()
+        exit(1)
 
 
 bitcoinPriceDiff = 8

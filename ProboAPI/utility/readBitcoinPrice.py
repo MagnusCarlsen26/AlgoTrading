@@ -1,7 +1,8 @@
 def readBitcoinPrice() -> float:
     with open("output.txt", "r") as file :
         try:
-            bitcoinPrice = float(file.read().strip())
+            x = (file.read().strip().split(',')[1])
+            bitcoinPrice = float(x)
             return bitcoinPrice
-        except ValueError as e:
+        except Exception as e:
             return readBitcoinPrice()
