@@ -8,7 +8,7 @@ def findLowestBuy(lst):
     else:
         return -1, 0, 0 
 
-def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay,prices,trades,toBuy=1,costPrice=0,profit=0,request_number=5,time=120):
+def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay,prices,trades,toBuy=1,costPrice=0,profit=0,request_number=5,time=0):
     while request_number < len(df)-1-sellDelay:
         lst = df.iloc[request_number].values
         lst = np.array(lst[:len(lst)-2])
@@ -17,7 +17,8 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
         if toBuy:
             if request_number > len(df) - time*10:
                 break
-            if buyCondition(df,request_number,item_path):
+            buyQuantity = buyCondition(df,request_number,item_path)
+            if buyQuantity:
                 buyIndex = request_number
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+buyDelay].values)
                 costPrice = buyCost
@@ -26,11 +27,13 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
             if sellCondition(df,request_number,costPrice,bookprofit,stopLoss,item_path):
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+sellDelay].values)
                 if buyCost - costPrice > 0:
-                    profit += min(bookprofit,(buyCost-0.5)-costPrice)
-                    prices[str(costPrice)] += float(min(bookprofit,(buyCost-0.5)-costPrice))
+                    profit += (min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity*0.8
+                    # print(f"profit = {(min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity}")
+                    prices[str(costPrice)] += float(min(bookprofit,(buyCost-0.5)-costPrice))*buyQuantity*0.8
                 else:
-                    profit += max(-stopLoss,(buyCost-0.5) - costPrice)
-                    prices[str(costPrice)] += float(max(-stopLoss,(buyCost-0.5) - costPrice))
+                    profit += max(-stopLoss,(buyCost-0.5) - costPrice)*buyQuantity
+                    # print(f"Loss = {max(-stopLoss,(buyCost-0.5) - costPrice)*buyQuantity} ")
+                    prices[str(costPrice)] += float(max(-stopLoss,(buyCost-0.5) - costPrice))*buyQuantity
 
                 toBuy = 1
                 costPrice = 0
