@@ -27,12 +27,12 @@ def trade(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,s
             if sellCondition(df,request_number,costPrice,bookprofit,stopLoss,item_path):
                 lowestIndex,lowerBuy,buyCost = findLowestBuy(df.iloc[request_number+sellDelay].values)
                 if buyCost - costPrice > 0:
-                    profit += (min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity*0.8
-                    # print(f"profit = {(min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity}")
-                    prices[str(costPrice)] += float(min(bookprofit,(buyCost-0.5)-costPrice))*buyQuantity*0.8
+                    profit += (min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity*1
+                    print(f"profit = {(min(bookprofit,(buyCost-0.5)-costPrice) )*buyQuantity}")
+                    prices[str(costPrice)] += float(min(bookprofit,(buyCost-0.5)-costPrice))*buyQuantity*1
                 else:
                     profit += max(-stopLoss,(buyCost-0.5) - costPrice)*buyQuantity
-                    # print(f"Loss = {max(-stopLoss,(buyCost-0.5) - costPrice)*buyQuantity} ")
+                    print(f"Loss = {max(-stopLoss,(buyCost-0.5) - costPrice)*buyQuantity} ")
                     prices[str(costPrice)] += float(max(-stopLoss,(buyCost-0.5) - costPrice))*buyQuantity
 
                 toBuy = 1

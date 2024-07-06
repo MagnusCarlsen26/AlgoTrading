@@ -102,15 +102,15 @@ def trade( topicId : list[int] ) :
                         profit = (trade_status(eventId,order_id).split()[-1])
                         # SEND EMAIL
                         logging.info(f"Order sold, profit = {profit}")
-                        isToBuy = True
                         logging.info("Analyzing to Buy...")
+                        isToBuy = True
                         continue
                     if sellAlgorithm(d['buyData'],d['sellData'],buy_price,orderType) :
                         cancel_order(eventId,order_id)
                         sell(0.5 , order_id)
                         time.sleep(0.5)
                         profit = (trade_status(eventId,order_id).split()[-1])
-                        logging.info(f"Order sold, profit = {profit}")
+                        logging.info(f"Order sold, Loss = {profit}")
                         isToBuy = True
                         logging.info("Analyzing to Buy...")
                 # time.sleep(5)
@@ -121,13 +121,13 @@ def trade( topicId : list[int] ) :
         exit(1)
 
 
-bitcoinPriceDiff = 8
+bitcoinPriceDiff = 10
 stoploss = 1.5
 bookprofit = 1.5
 ignores = [0,8]
-
+ 
 thread1 = threading.Thread(target=collectBitcoinPrice, args=())
-thread2 = threading.Thread(target=trade, args=([2449]))
+thread2 = threading.Thread(target=collectData, args=([23622]))
 
 thread1.start()
 thread2.start()

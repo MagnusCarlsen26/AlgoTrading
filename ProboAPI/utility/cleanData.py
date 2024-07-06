@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 
-def clean(base_directory = './Bitcoin'):
+def clean(base_directory = '../Bitcoin'):
     directories_to_search = [base_directory]
     prices = [str(i/2) for i in range(1,20)]
     prices.append('Time')
@@ -24,7 +24,7 @@ def clean(base_directory = './Bitcoin'):
                     df.columns = prices
                     def your_function(row):
                         start = row[0]
-                        for i in range(len(row)-2):
+                        for i in range(1,len(row)-2):
                             row.iloc[i] -= start
                             start += row.iloc[i]
                         return row

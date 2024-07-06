@@ -207,14 +207,15 @@ def collectBitcoinPrice() :
         if data.get("t") == "d" and data.get("d", {}).get("b", {}).get("p") == "crypto/btcusdt":
             try:
                 currBitcoinPrice = float(data["d"]["b"]["d"]["closePrice"])
-                with open("output.txt", "r") as f:
-                    content = f.read()
+                # with open("output.txt", "r") as f:
+                #     content = f.read()
                 with open("output.txt","w") as f :
-                    if content == "":
-                        f.write(f"{currBitcoinPrice},0")
-                    else:
-                        prevBitcoinPrice = float(content.strip().split(',')[0])  
-                        f.write(f"{currBitcoinPrice},{round(currBitcoinPrice - prevBitcoinPrice, 2) }")
+                    f.write(str(currBitcoinPrice))
+                    # if contenPt == "":
+                    #     f.write(f"{currBitcoinPrice},0")
+                    # else:
+                    #     prevBitcoinPrice = float(content.strip().split(',')[0])  
+                    #     f.write(f"{currBitcoinPrice},{round(currBitcoinPrice - prevBitcoinPrice, 2) }")
 
             except Exception as e:
                 print(f"collectBitcoinPrice  : {e}")
@@ -249,16 +250,18 @@ def collectBitcoinPrice() :
         time.sleep(3)
 
 def collectData( topicId : list[int] ) :
+    time.sleep(3)
     try :
         while True:
-            eventId = getEventIds([topicId])[0]
+            eventId = getEventIds([topicId])[2]
             while True :
                 d = buyBook(eventId)
+                # print(d['buyData'])
+                # print(d['title'])
                 if d['buyData'] == {} :
                     break
-
-                save('yes' , d['buyData'] , d['title'][-9:][:8].replace(':','-') , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Bitcoin' )
-                save('no' , d['sellData'] , d['title'][-9:][:8].replace(':','-') , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Bitcoin' )
+                save('yes' , d['buyData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Cricket' )
+                save('no' , d['sellData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Cricket' )
     except Exception as e:
         print("Error while collecting data ... ",e)
         collectData(topicId)

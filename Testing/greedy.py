@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 
-params = [0.75,1,1.25]
+params = [0.75,0,1.25]
 importance = 0
 profit = []
 loss = []

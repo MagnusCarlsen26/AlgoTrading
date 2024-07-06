@@ -9,10 +9,11 @@ def test(strategy,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDe
         current_directory = directories_to_search.pop(0)  
         for item in os.listdir(current_directory):
             item_path = os.path.join(current_directory, item)
-
+            
             if os.path.isdir(item_path):
                 directories_to_search.append(item_path)  
             elif item.endswith('.csv'):
+                print(item_path)
                 df = pd.read_csv(item_path)
                 x = strategy(item_path,df,stopLoss,bookprofit,buyCondition,sellCondition,buyDelay,sellDelay,prices,trades)
                 # print(f'Overall Profit = {x}')
