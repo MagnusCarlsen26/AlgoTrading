@@ -17,10 +17,17 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+prevBitcoinPrice = 0
+
 def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
-
-    diff = readBitcoinPrice()
-
+    global prevBitcoinPrice
+    currBitcoinPrice = readBitcoinPrice()
+    if prevBitcoinPrice != 0 :
+        diff = currBitcoinPrice - prevBitcoinPrice
+    else :
+        prevBitcoinPrice = currBitcoinPrice
+        return 0
+    prevBitcoinPrice = currBitcoinPrice
     if diff >= 1 :
         currPrice = getBuyPrice( buyBook )
         factor = 1
@@ -29,20 +36,25 @@ def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
         factor = -1
     else:
         return 0
-    
+    print(diff)
     for ignore in ignores:
         if ignore <= currPrice <= ignore + 2:
             return 0
-        
+
     if factor*diff >= bitcoinPriceDiff :
         logging.info(f"Difference = {diff}")
         return factor*currPrice
     return 0
 
 def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType : Literal['yes','no']) -> bool :
-
-    diff = readBitcoinPrice()
-    
+    global prevBitcoinPrice
+    currBitcoinPrice = readBitcoinPrice()
+    if prevBitcoinPrice != 0 :
+        diff = currBitcoinPrice - prevBitcoinPrice
+    else :
+        prevBitcoinPrice = currBitcoinPrice
+        return 0
+    prevBitcoinPrice = currBitcoinPrice
     if orderType == 'yes' :
         currPrice = getBuyPrice(buyBook)
         factor = -1
@@ -125,9 +137,11 @@ bitcoinPriceDiff = 10
 stoploss = 1.5
 bookprofit = 1.5
 ignores = [0,8]
- 
+
 thread1 = threading.Thread(target=collectBitcoinPrice, args=())
-thread2 = threading.Thread(target=collectData, args=([23622]))
+thread2 = threading.Thread(target=trade, args=([2449]))
+thread3 = threading.Thread(target=collectData,args=([2449]))
 
 thread1.start()
 thread2.start()
+thread3.start()
