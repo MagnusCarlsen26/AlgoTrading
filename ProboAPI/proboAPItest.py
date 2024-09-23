@@ -10,7 +10,7 @@ import logging
 import traceback
 
 logging.basicConfig(
-    filename='trade_log.txt', 
+    filename='logs/trade_log.txt', 
     level=logging.INFO,
     filemode='w', 
     format='%(asctime)s.%(msecs)03d - %(levelname)s - %(threadName)s - %(message)s',
@@ -72,7 +72,7 @@ def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType :
 
 def trade( topicId : list[int] ) : 
     while True :
-        with open("output.txt") as f:
+        with open("logs/output.txt") as f:
             x = f.read()
             if x != "":
                 break

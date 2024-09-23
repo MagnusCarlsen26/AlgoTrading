@@ -12,7 +12,7 @@ def save(type,transposed_data,title,time,fileOrigin):
     folderName = title[-9:][:8].replace(':','-')[-9:][:8].replace(':','-') + " " + title.split()[5]
     folderName = fileOrigin + '/' +str(date) + '/' +folderName
     transposed_data['time'] = time 
-    with open("output.txt", "r") as file :
+    with open("logs/output.txt", "r") as file :
         try:
             bitcoinPrice = float(file.read().strip())
         except ValueError as e:

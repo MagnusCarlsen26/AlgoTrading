@@ -14,11 +14,11 @@ import time
 
 load_dotenv()
 
-authorization_dummy = os.environ.get('Authorization_Dummy') 
-authorization_real = os.environ.get('Authorization_Real')
+authorization_dummy = os.environ.get('AUTHORIZATION_DUMMY')
+authorization_real = os.environ.get('AUTHORIZATION_REAL')
 url = 'https://prod.api.probo.in/api/'
 prices = [str(i/2) for i in range(1,20)]
-with open('config.json','r') as f:
+with open('logs/config.json','r') as f:
     config = json.load(f)
 
 # logging.basicConfig(filename='apiErrorlogs.txt', level=logging.INFO,filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
@@ -159,7 +159,7 @@ def trade_status(eventId : int , order_id: int):
                     elif status == 'Matched Orders' :
                         return 'Matched'
                     elif status == 'Exited Orders' :
-                        return f'Exited {tr['profit']}'
+                        return f"Exited {tr['profit']}"
                     elif status == 'Cancelled Orders':
                         return 'Cancelled'   
                     elif status == 'Exiting Orders':
@@ -209,7 +209,7 @@ def collectBitcoinPrice() :
                 currBitcoinPrice = float(data["d"]["b"]["d"]["closePrice"])
                 # with open("output.txt", "r") as f:
                 #     content = f.read()
-                with open("output.txt","w") as f :
+                with open("logs/output.txt","w") as f :
                     f.write(str(currBitcoinPrice))
                     # if contenPt == "":
                     #     f.write(f"{currBitcoinPrice},0")
@@ -236,7 +236,7 @@ def collectBitcoinPrice() :
     
     while True:
         try :
-            with open("output.txt" , "w") as file:
+            with open("logs/output.txt" , "w") as file:
                 file.write("")
             ws_app = websocket.WebSocketApp(
                 "wss://s-apse1a-nss-6013.asia-southeast1.firebasedatabase.app/.ws?v=5&p=1:530071772200:web:38ba8735b6fd3ff69a291d&ns=prod-probo-realtime-db-2",
@@ -253,15 +253,16 @@ def collectData( topicId : list[int] ) :
     time.sleep(3)
     try :
         while True:
-            eventId = getEventIds([topicId])[2]
+            eventId = getEventIds([topicId])[0]
             while True :
                 d = buyBook(eventId)
                 # print(d['buyData'])
                 # print(d['title'])
                 if d['buyData'] == {} :
                     break
-                save('yes' , d['buyData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Cricket' )
-                save('no' , d['sellData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'Cricket' )
+                print("F")
+                save('yes' , d['buyData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'dataCollected/' )
+                save('no' , d['sellData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'dataCollected/' )
     except Exception as e:
         print("Error while collecting data ... ",e)
         collectData(topicId)
