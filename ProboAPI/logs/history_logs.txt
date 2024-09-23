@@ -1,4 +1,4 @@
-2024-06-23 19:40:40.967 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 19:40:40.967 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 19:40:41.581 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64310.00 USDT or more at 07:50 PM?
 2024-06-23 19:40:42.631 - INFO - Thread-2 (trade) - Difference = -9.64
 2024-06-23 19:40:42.631 - INFO - Thread-2 (trade) - Buying no for 6.5...
@@ -32,7 +32,7 @@
 2024-06-23 20:08:00.723 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64282.83 USDT or more at 08:15 PM?
 2024-06-23 20:13:00.356 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64289.99 USDT or more at 08:20 PM?
 
-2024-06-23 20:39:38.647 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 20:39:38.647 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 20:39:39.690 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64146.02 USDT or more at 08:45 PM?
 2024-06-23 20:40:16.045 - INFO - Thread-2 (trade) - Difference = 8.95
 2024-06-23 20:40:16.045 - INFO - Thread-2 (trade) - Buying yes for 6.0...
@@ -81,7 +81,7 @@
 2024-06-23 20:51:33.266 - INFO - Thread-2 (trade) - Analyzing to Buy...
 2024-06-23 20:53:00.790 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64194.01 USDT or more at 09:00 PM?
 
-2024-06-23 21:04:57.973 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 21:04:57.973 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 21:04:58.623 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64142.40 USDT or more at 09:10 PM?
 2024-06-23 21:06:34.380 - INFO - Thread-2 (trade) - Difference = 17.72
 2024-06-23 21:06:34.380 - INFO - Thread-2 (trade) - Buying yes for 7.5...
@@ -101,12 +101,12 @@
 2024-06-23 21:08:00.653 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64131.68 USDT or more at 09:15 PM?
 2024-06-23 21:13:00.443 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64164.97 USDT or more at 09:20 PM?
 2024-06-23 21:18:00.413 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64146.38 USDT or more at 09:25 PM?
-2024-06-23 21:38:58.258 - ERROR - Thread-1 (collectBitcoinPrice) - Connection to remote host was lost. - goodbye
-2024-06-23 21:39:01.499 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 21:38:58.258 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - Connection to remote host was lost. - goodbye
+2024-06-23 21:39:01.499 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 
-2024-06-23 22:26:08.366 - ERROR - Thread-1 (collectBitcoinPrice) - [Errno 11001] getaddrinfo failed - goodbye
-2024-06-23 22:26:11.371 - ERROR - Thread-1 (collectBitcoinPrice) - [Errno 11001] getaddrinfo failed - goodbye
-2024-06-23 22:26:14.584 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 22:26:08.366 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - [Errno 11001] getaddrinfo failed - goodbye
+2024-06-23 22:26:11.371 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - [Errno 11001] getaddrinfo failed - goodbye
+2024-06-23 22:26:14.584 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 22:26:15.457 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64003.98 USDT or more at 10:35 PM?
 2024-06-23 22:27:24.357 - INFO - Thread-2 (trade) - Difference = 19.21
 2024-06-23 22:27:24.357 - INFO - Thread-2 (trade) - Buying yes for 3.5...
@@ -119,7 +119,7 @@
 2024-06-23 22:27:51.240 - INFO - Thread-2 (trade) - Order sold, profit = 1.5
 2024-06-23 22:27:51.241 - INFO - Thread-2 (trade) - Analyzing to Buy...
 
-2024-06-23 22:50:19.861 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 22:50:19.861 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 22:50:20.638 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64168.40 USDT or more at 11:00 PM?
 2024-06-23 22:51:14.829 - INFO - Thread-2 (trade) - Difference = -19.98
 2024-06-23 22:51:14.829 - INFO - Thread-2 (trade) - Buying no for 7.0...
@@ -152,7 +152,7 @@
 2024-06-23 23:10:12.664 - INFO - Thread-2 (trade) - Analyzing to Buy...
 2024-06-23 23:13:01.476 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64164.00 USDT or more at 11:20 PM?
 
-2024-06-23 23:15:53.621 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 23:15:53.621 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 23:15:54.298 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64112.00 USDT or more at 11:25 PM?
 2024-06-23 23:16:13.287 - INFO - Thread-2 (trade) - Difference = 18.09
 2024-06-23 23:16:13.287 - INFO - Thread-2 (trade) - Buying yes for 4.0...
@@ -184,8 +184,8 @@
 2024-06-23 23:38:00.919 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64131.34 USDT or more at 11:45 PM?
 2024-06-23 23:43:00.657 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64096.31 USDT or more at 11:50 PM?
 
-2024-06-23 23:48:24.362 - ERROR - Thread-1 (collectBitcoinPrice) - [Errno 11001] getaddrinfo failed - goodbye
-2024-06-23 23:48:27.558 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 23:48:24.362 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - [Errno 11001] getaddrinfo failed - goodbye
+2024-06-23 23:48:27.558 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 23:48:28.189 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
 2024-06-23 23:53:00.469 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
 2024-06-23 23:53:00.854 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
@@ -479,7 +479,7 @@
 2024-06-24 00:11:09.081 - INFO - Thread-2 (trade) - Analyzing to Buy...
 2024-06-24 00:13:00.348 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64113.98 USDT or more at 12:20 AM?
 
-2024-06-24 11:33:34.149 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 11:33:34.149 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 11:33:34.791 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62314.01 USDT or more at 11:40 AM?
 2024-06-24 11:34:10.638 - INFO - Thread-2 (trade) - Difference = -21.26
 2024-06-24 11:34:10.638 - INFO - Thread-2 (trade) - Buying no for 6.5...
@@ -531,7 +531,7 @@
 2024-06-24 11:36:04.411 - INFO - Thread-2 (trade) - Buying no for 4.0...
 2024-06-24 11:36:04.816 - INFO - Thread-2 (trade) - Order didn't match, cancelling it.
 
-2024-06-24 11:42:54.734 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 11:42:54.734 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 11:42:55.342 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62160.73 USDT or more at 11:50 AM?
 2024-06-24 11:48:00.305 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62286.22 USDT or more at 11:55 AM?
 2024-06-24 11:48:06.187 - INFO - Thread-2 (trade) - Difference = 14.27
@@ -611,7 +611,7 @@ Traceback (most recent call last):
 TypeError: argument of type 'NoneType' is not iterable
 2024-06-24 11:49:45.186 - INFO - Thread-2 (trade) - STATUS = None.............
 
-2024-06-24 15:17:19.966 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 15:17:19.966 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 15:17:20.676 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 61085.10 USDT or more at 03:25 PM?
 2024-06-24 15:23:00.332 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 61314.14 USDT or more at 03:30 PM?
 2024-06-24 15:23:19.488 - INFO - Thread-2 (trade) - Difference = -16.6
@@ -966,7 +966,7 @@ TypeError: argument of type 'NoneType' is not iterable
 2024-06-24 16:09:22.519 - INFO - Thread-2 (trade) - Profit = 1.5. Sold because of bookprofit.
 2024-06-24 16:09:23.020 - INFO - Thread-2 (trade) - Analyzing to Buy...
 
-2024-06-24 16:12:51.751 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 16:12:51.751 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 16:12:52.406 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 61181.39 USDT or more at 04:20 PM?
 2024-06-24 16:12:56.296 - INFO - Thread-2 (trade) - Difference = 16.0
 2024-06-24 16:12:56.296 - INFO - Thread-2 (trade) - Buying yes for 5.0...
@@ -1063,7 +1063,7 @@ TypeError: argument of type 'NoneType' is not iterable
 2024-06-24 16:22:05.210 - INFO - Thread-2 (trade) - Analyzing to Buy...
 2024-06-24 16:23:00.428 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 61144.02 USDT or more at 04:30 PM?
 
-2024-07-05 21:54:03.549 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-07-05 21:54:03.549 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-07-05 21:54:04.300 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 56585.54 USDT or more at 10:05 PM?
 2024-07-05 21:54:20.770 - INFO - Thread-2 (trade) - Difference = 18.59
 2024-07-05 21:54:20.770 - INFO - Thread-2 (trade) - Buying yes for 5.5...
@@ -1270,7 +1270,7 @@ TypeError: argument of type 'NoneType' is not iterable
 2024-07-05 22:00:44.778 - INFO - Thread-2 (trade) - Delta = 0.0. Sold because of difference = 14.19.
 2024-07-05 22:00:45.279 - INFO - Thread-2 (trade) - Analyzing to Buy...
 
-2024-07-06 12:15:03.892 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-07-06 12:15:03.892 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-07-06 12:15:04.893 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 56518.00 USDT or more at 12:25 PM?
 2024-07-06 12:15:48.243 - INFO - Thread-2 (trade) - Difference = -12.44999999999709
 2024-07-06 12:15:48.243 - INFO - Thread-2 (trade) - Buying no for 6.0...
@@ -1413,7 +1413,7 @@ TypeError: argument of type 'NoneType' is not iterable
 
 SAVE ORDER BOOK LOGS
 
-2024-07-29 01:09:37.664 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-07-29 01:09:37.664 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-07-29 01:09:38.291 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 68138.79 USDT or more at 01:15 AM?
 2024-07-29 01:13:00.667 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 68129.67 USDT or more at 01:20 AM?
 2024-07-29 01:14:04.704 - INFO - Thread-2 (trade) - Difference = 10.080000000001746
@@ -1433,7 +1433,7 @@ SAVE ORDER BOOK LOGS
 2024-07-29 01:17:17.095 - INFO - Thread-2 (trade) - Order sold, profit = 1.5
 2024-07-29 01:17:17.095 - INFO - Thread-2 (trade) - Analyzing to Buy...
 
-2024-07-31 20:31:50.825 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-07-31 20:31:50.825 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-07-31 20:31:51.691 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 66440.01 USDT or more at 08:40 PM?
 2024-07-31 20:31:55.412 - INFO - Thread-2 (trade) - Difference = 11.990000000005239
 2024-07-31 20:31:55.412 - INFO - Thread-2 (trade) - Buying yes for 3.0...
@@ -1552,10 +1552,10 @@ SAVE ORDER BOOK LOGS
 2024-07-31 20:39:23.849 - INFO - Thread-2 (trade) - Selling because difference = -11.990000000005239.
 2024-07-31 20:39:24.865 - INFO - Thread-2 (trade) - Order sold, Loss = -0.5
 2024-07-31 20:39:24.865 - INFO - Thread-2 (trade) - Analyzing to Buy...
-2024-07-31 20:40:40.209 - ERROR - Thread-1 (collectBitcoinPrice) - ping/pong timed out - goodbye
-2024-07-31 20:40:46.224 - ERROR - Thread-1 (collectBitcoinPrice) - [Errno 11001] getaddrinfo failed - goodbye
+2024-07-31 20:40:40.209 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - ping/pong timed out - goodbye
+2024-07-31 20:40:46.224 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - [Errno 11001] getaddrinfo failed - goodbye
 
-2024-08-01 11:50:15.191 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-08-01 11:50:15.191 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-08-01 11:50:16.174 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64207.94 USDT or more at 12:00 PM?
 2024-08-01 11:50:18.320 - INFO - Thread-2 (trade) - Difference = 18.060000000004948
 2024-08-01 11:50:18.320 - INFO - Thread-2 (trade) - Buying yes for 5.0...

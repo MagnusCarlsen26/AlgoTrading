@@ -1,7 +1,7 @@
 import time
 import threading
 from typing import Literal
-from utility.api import buy,buyBook,cancel_order,sell,trade_status,getBuyPrice,collectBitcoinPrice,collectData
+from utility.api import buy,buyBook,cancel_order,sell,trade_status,getBuyPrice,collectBitcoinPriceFromProbo,collectBitcoinData,collectBitcoinPriceFromBinance
 from utility.abort import abort
 from utility.smartQuestionSelector import smartQuestionSelector
 from utility.readBitcoinPrice import readBitcoinPrice
@@ -42,7 +42,8 @@ def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
             return 0
 
     if factor*diff >= bitcoinPriceDiff :
-        logging.info(f"Difference = {diff}")
+        print(f"Trying to buy {factor}, diff = {diff}")
+        logging.info(f"Trying to buy {factor}, diff = {diff}")
         return factor*currPrice
     return 0
 
@@ -63,10 +64,12 @@ def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType :
         factor = 1
     
     if factor*diff > bitcoinPriceDiff:
-        logging.info(f"Selling because difference = {diff}.")
+        print(f"Trying to sell at {currPrice - 0.5} because difference = {diff}.")
+        logging.info(f"Trying to sell at {currPrice - 0.5} because difference = {diff}.")
         return True
     if buyPrice - (currPrice - 0.5) >= stoploss :
-        logging.info(f"Selling because of stoploss.")
+        print(f"Trying to sell at {currPrice - 0.5} because of stop loss.")
+        logging.info(f"Trying to sell at {currPrice - 0.5} because of stop loss.")
         return True
     return False    
 
@@ -83,8 +86,8 @@ def trade( topicId : list[int] ) :
             isToBuy = True
             d = buyBook(eventId)
             logging.info(f"Question : {d['title']}")
+            print(f"Working on {d['title']}")
             while True :
-                d = buyBook(eventId)
                 if abort(d['title'],isToBuy) :
                     break
                 if isToBuy:
@@ -99,21 +102,27 @@ def trade( topicId : list[int] ) :
                         status = trade_status(eventId, order_id)
                         if status == 'Pending' :
                             logging.info("Order didn't match, cancelling it.")
+                            print("Order didn't match, cancelling it.")
                             while status != 'Cancelled':
                                 cancel_order(eventId,order_id)
                                 status = trade_status(eventId,order_id)
+                            print("Order Cancelled.")
                             logging.info("Order Cancelled")
                         elif status == 'Matched':
                             sell( min(buy_price + bookprofit,9.5) , order_id)
                             isToBuy = False
+                            print("Analyzing for selling...")
                             logging.info("Analyzing for selling...")
                         else:
+                            print(f"STATUS = {status}.............")
                             logging.info(f"STATUS = {status}.............")
                 else :
                     if 'Exited' in trade_status(eventId,order_id):
                         profit = (trade_status(eventId,order_id).split()[-1])
                         # SEND EMAIL
-                        logging.info(f"Order sold, profit = {profit}")
+                        print(f"Order sold, profit/loss = {profit}.")
+                        logging.info(f"Order sold, profit/loss = {profit}.")
+                        print("Analyzing to Buy...")
                         logging.info("Analyzing to Buy...")
                         isToBuy = True
                         continue
@@ -124,6 +133,7 @@ def trade( topicId : list[int] ) :
                         profit = (trade_status(eventId,order_id).split()[-1])
                         logging.info(f"Order sold, Loss = {profit}")
                         isToBuy = True
+                        print(f"Analyzing to buy.")
                         logging.info("Analyzing to Buy...")
                 # time.sleep(5)
     except Exception as e:  
@@ -133,15 +143,17 @@ def trade( topicId : list[int] ) :
         exit(1)
 
 
-bitcoinPriceDiff = 10
+bitcoinPriceDiff = 5
 stoploss = 1.5
 bookprofit = 1.5
-ignores = [0,8]
+ignores = [0,1,8]
 
-thread1 = threading.Thread(target=collectBitcoinPrice, args=())
-thread2 = threading.Thread(target=trade, args=([2449]))
-thread3 = threading.Thread(target=collectData,args=([2449]))
+# thread1 = threading.Thread(target=collectBitcoinPriceFromProbo, args=())
+thread2 = threading.Thread(target=collectBitcoinPriceFromBinance, args=())
+# thread3 = threading.Thread(target=collectBitcoinData,args=([2449]))
+thread4 = threading.Thread(target=trade, args=([2449]))
 
-thread1.start()
+# thread1.start()
 thread2.start()
-thread3.start()
+# thread3.start()
+thread4.start()

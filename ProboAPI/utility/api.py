@@ -199,26 +199,19 @@ def getBuyPrice( buyBook : dict ) -> int :
             return float(i)
     return 10
 
-def collectBitcoinPrice() :
-
+def collectBitcoinPriceFromProbo() :
     def on_message(ws,message):
         data = json.loads(message)
 
         if data.get("t") == "d" and data.get("d", {}).get("b", {}).get("p") == "crypto/btcusdt":
             try:
                 currBitcoinPrice = float(data["d"]["b"]["d"]["closePrice"])
-                # with open("output.txt", "r") as f:
-                #     content = f.read()
-                with open("logs/output.txt","w") as f :
+                print(currBitcoinPrice)
+                with open("logs/proboPrice.txt","w") as f :
                     f.write(str(currBitcoinPrice))
-                    # if contenPt == "":
-                    #     f.write(f"{currBitcoinPrice},0")
-                    # else:
-                    #     prevBitcoinPrice = float(content.strip().split(',')[0])  
-                    #     f.write(f"{currBitcoinPrice},{round(currBitcoinPrice - prevBitcoinPrice, 2) }")
 
             except Exception as e:
-                print(f"collectBitcoinPrice  : {e}")
+                print(f"collectBitcoinPriceFromProbo  : {e}")
 
     def on_open(ws):
         subscription_request = {
@@ -233,36 +226,96 @@ def collectBitcoinPrice() :
             }
         }
         ws.send(json.dumps(subscription_request))
-    
+        print('connection made')
     while True:
         try :
-            with open("logs/output.txt" , "w") as file:
+            with open("logs/proboPrice.txt" , "w") as file:
                 file.write("")
+
             ws_app = websocket.WebSocketApp(
                 "wss://s-apse1a-nss-6013.asia-southeast1.firebasedatabase.app/.ws?v=5&p=1:530071772200:web:38ba8735b6fd3ff69a291d&ns=prod-probo-realtime-db-2",
                 on_message=on_message,
             )
-
+            print('g')
             ws_app.on_open = on_open
             ws_app.run_forever(ping_interval=30, ping_timeout=10)  
         except Exception as e:
             logging.exception('Error getting bitcoin price retrying ...',e)
         time.sleep(3)
 
-def collectData( topicId : list[int] ) :
+def collectBitcoinPriceFromBinance():
+    while True :
+        url = 'https://api.binance.com/api/v3/ticker/price'
+        params = {'symbol': 'BTCUSDT'}  # Symbol for Bitcoin to USDT
+        try:
+            response = requests.get(url, params=params)
+            price = response.json()
+            with open("logs/binancePrice.txt","w") as f :
+                f.write(str(price['price']))
+        except Exception as e:
+            print(f"Error fetching Bitcoin price: {e}")
+
+def collectBitcoinData( topicId : list[int] ) :
     time.sleep(3)
     try :
         while True:
             eventId = getEventIds([topicId])[0]
             while True :
                 d = buyBook(eventId)
-                # print(d['buyData'])
-                # print(d['title'])
-                if d['buyData'] == {} :
+                if d['buyData'] :
+                    today = datetime.today()
+                    date = today.strftime("%Y-%m-%d")
+                    folderName = d['title'][-9:][:8].replace(':','-')[-9:][:8].replace(':','-') + " " + d['title'].split()[5]
+                    folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
+                    binancePrice = None
+                    while True:
+                        with open("logs/proboPrice.txt", "r") as file :
+                            try:
+                                bitcoinPrice = float(file.read().strip())
+                                break
+                            except ValueError as e:
+                                print(f"error while reading bitcoinPrice : error : {e}")
+                                
+                    while True :
+                        with open("logs/binancePrice.txt", "r") as file :
+                            try:
+                                binancePrice = float(file.read().strip())
+                                break
+                            except ValueError as e:
+                                print(f"error while reading binancePrice : error : {e}")
+                                
+                        
+                    d['buyData']["bitcoinPricefromProbo"] = bitcoinPrice
+                    d['sellData']["bitcoinPricefromProbo"] = bitcoinPrice
+                    d['buyData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+                    d['buyData']["bitcoinPricefromBinance"] = binancePrice
+                    d['sellData']["bitcoinPricefromBinance"] = binancePrice
+                    d['sellData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                    print(bitcoinPrice,binancePrice )
+                    if d['buyData'] == {} :
+                        break
+                    save('yes' , d['buyData'] , folderName )
+                    save('no' , d['sellData'] , folderName )
+                else :
                     break
-                print("F")
-                save('yes' , d['buyData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'dataCollected/' )
-                save('no' , d['sellData'] , d['title'] , datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] , 'dataCollected/' )
+    except Exception as e:
+        print("Error while collecting bitcoin data ... ",e)
+        collectBitcoinData(topicId)
+
+def collectEventPrice( eventId : list[int] ) :
+    try :
+        while True :
+            d = buyBook(eventId)
+            today = datetime.today()
+            date = today.strftime("%Y-%m-%d")
+            folderName = d['title']
+            folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
+            d['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            if d['buyData'] == {} :
+                break
+            save('yes' , d['buyData'] , folderName )
+            save('no' , d['sellData'] , folderName )
     except Exception as e:
         print("Error while collecting data ... ",e)
-        collectData(topicId)
+        collectEventPrice(eventId)

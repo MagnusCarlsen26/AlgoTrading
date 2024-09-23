@@ -1,7 +1,7 @@
 import time
 import threading
 from typing import Literal
-from utility.api import buyBook,getBuyPrice,collectBitcoinPrice
+from utility.api import buyBook,getBuyPrice,collectBitcoinPriceFromProbo
 from utility.abort import abort
 from utility.smartQuestionSelector import smartQuestionSelector
 from utility.readBitcoinPrice import readBitcoinPrice
@@ -122,7 +122,7 @@ stoploss = 1.5
 bookprofit = 1.5
 ignores = [0,8]
 
-thread1 = threading.Thread(target=collectBitcoinPrice, args=())
+thread1 = threading.Thread(target=collectBitcoinPriceFromProbo, args=())
 thread2 = threading.Thread(target=trade, args=([2449]))
 
 thread1.start()

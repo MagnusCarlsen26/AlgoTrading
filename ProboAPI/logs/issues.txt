@@ -51,8 +51,8 @@ Error handling and confirmation in utility/api.py sell() and cancel_order() is p
 
 ### ISSUE 3
 
-2024-06-23 23:48:24.362 - ERROR - Thread-1 (collectBitcoinPrice) - [Errno 11001] getaddrinfo failed - goodbye
-2024-06-23 23:48:27.558 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-23 23:48:24.362 - ERROR - Thread-1 (collectBitcoinPriceFromProbo) - [Errno 11001] getaddrinfo failed - goodbye
+2024-06-23 23:48:27.558 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-23 23:48:28.189 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
 2024-06-23 23:53:00.469 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
 2024-06-23 23:53:00.854 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 64092.33 USDT or more at 11:55 PM?
@@ -348,7 +348,7 @@ Error handling and confirmation in utility/api.py sell() and cancel_order() is p
 
 ### ISSUE 4
 
-2024-06-24 11:33:34.149 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 11:33:34.149 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 11:33:34.791 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62314.01 USDT or more at 11:40 AM?
 2024-06-24 11:34:10.638 - INFO - Thread-2 (trade) - Difference = -21.26
 2024-06-24 11:34:10.638 - INFO - Thread-2 (trade) - Buying no for 6.5...
@@ -402,7 +402,7 @@ Error handling and confirmation in utility/api.py sell() and cancel_order() is p
 
 ### ISSUE 5
 
-2024-06-24 11:37:31.288 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 11:37:31.288 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 11:37:31.936 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62233.67 USDT or more at 11:45 AM?
 2024-06-24 11:37:59.862 - INFO - Thread-2 (trade) - Difference = -11.51
 2024-06-24 11:37:59.862 - INFO - Thread-2 (trade) - Buying no for 3.0...
@@ -436,7 +436,7 @@ TypeError: 'NoneType' object is not subscriptable
 
 ### ISSUE 6
 
-2024-06-24 11:40:00.509 - INFO - Thread-1 (collectBitcoinPrice) - Websocket connected
+2024-06-24 11:40:00.509 - INFO - Thread-1 (collectBitcoinPriceFromProbo) - Websocket connected
 2024-06-24 11:40:01.178 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 62233.67 USDT or more at 11:45 AM?
 2024-06-24 11:40:01.889 - INFO - Thread-2 (trade) - Difference = 19.38
 2024-06-24 11:40:01.890 - INFO - Thread-2 (trade) - Buying yes for 4.5...
@@ -510,3 +510,35 @@ Traceback (most recent call last):
        ^^^^^^^^^^^^^^^^
 TypeError: argument of type 'NoneType' is not iterable
 2024-06-24 11:42:15.808 - INFO - Thread-2 (trade) - STATUS = None.............
+
+### ISSUE 4
+
+2024-09-23 22:56:41.238 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 63173.25 USDT or more at 11:05 PM?
+2024-09-23 22:57:00.464 - INFO - Thread-2 (trade) - Difference = 5.989999999997963
+2024-09-23 22:57:00.464 - INFO - Thread-2 (trade) - Buying yes for 6.0...
+2024-09-23 22:57:00.960 - INFO - Thread-2 (trade) - Order didn't match, cancelling it.
+2024-09-23 22:57:01.546 - INFO - Thread-2 (trade) - Order Cancelled
+2024-09-23 22:57:37.199 - INFO - Thread-2 (trade) - Difference = -7.44999999999709
+2024-09-23 22:57:37.199 - INFO - Thread-2 (trade) - Buying no for 4.5...
+2024-09-23 22:57:37.921 - INFO - Thread-2 (trade) - Analyzing for selling...
+2024-09-23 22:57:45.991 - INFO - Thread-2 (trade) - Selling because difference = 8.12999999999738.
+2024-09-23 22:57:46.796 - INFO - Thread-2 (trade) - Order sold, Loss = -0.5
+2024-09-23 22:57:46.796 - INFO - Thread-2 (trade) - Analyzing to Buy...
+2024-09-23 22:57:46.796 - INFO - Thread-2 (trade) - Difference = -8.040000000000873
+2024-09-23 22:57:46.796 - INFO - Thread-2 (trade) - Buying no for 4.5...
+2024-09-23 22:57:47.341 - INFO - Thread-2 (trade) - Analyzing for selling...
+2024-09-23 22:58:18.201 - ERROR - Thread-2 (trade) - argument of type 'NoneType' is not iterableError in trade_status()
+Traceback (most recent call last):
+  File "/home/khushal/AlgoTrading/ProboAPI/utility/api.py", line 149, in trade_status
+    if 'records' not in data :
+TypeError: argument of type 'NoneType' is not iterable
+2024-09-23 22:58:18.201 - ERROR - Thread-2 (trade) - argument of type 'NoneType' is not iterable
+Traceback (most recent call last):
+  File "/home/khushal/AlgoTrading/ProboAPI/utility/api.py", line 149, in trade_status
+    if 'records' not in data :
+TypeError: argument of type 'NoneType' is not iterable
+2024-09-23 22:58:20.568 - ERROR - Thread-2 (trade) - ERROR argument of type 'NoneType' is not iterable
+Traceback (most recent call last):
+  File "/home/khushal/AlgoTrading/ProboAPI/tradeBitcoin.py", line 112, in trade
+    if 'Exited' in trade_status(eventId,order_id):
+TypeError: argument of type 'NoneType' is not iterable

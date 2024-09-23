@@ -1,5 +1,5 @@
 def readBitcoinPrice() -> float:
-    with open("logs/output.txt", "r") as file :
+    with open("logs/binancePrice.txt", "r") as file :
         try:
             x = (file.read().strip())
             bitcoinPrice = float(x)
