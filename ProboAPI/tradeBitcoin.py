@@ -10,9 +10,9 @@ import logging
 import traceback
 
 logging.basicConfig(
-    filename='logs/trade_log.txt', 
+    filename='logs/history_logs.txt', 
     level=logging.INFO,
-    filemode='w', 
+    filemode='a', 
     format='%(asctime)s.%(msecs)03d - %(levelname)s - %(threadName)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
@@ -36,14 +36,14 @@ def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
         factor = -1
     else:
         return 0
-    print(diff)
+    print(round(diff,2))
     for ignore in ignores:
         if ignore <= currPrice <= ignore + 2:
             return 0
 
     if factor*diff >= bitcoinPriceDiff :
-        print(f"Trying to buy {factor}, diff = {diff}")
-        logging.info(f"Trying to buy {factor}, diff = {diff}")
+        print(f"Trying to buy {factor} at {currPrice}, diff = {round(diff,2)}")
+        logging.info(f"Trying to buy {factor}, diff = {round(diff,2)}")
         return factor*currPrice
     return 0
 
@@ -64,8 +64,8 @@ def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType :
         factor = 1
     
     if factor*diff > bitcoinPriceDiff:
-        print(f"Trying to sell at {currPrice - 0.5} because difference = {diff}.")
-        logging.info(f"Trying to sell at {currPrice - 0.5} because difference = {diff}.")
+        print(f"Trying to sell at {currPrice - 0.5} because difference = {round(diff,2)}.")
+        logging.info(f"Trying to sell at {currPrice - 0.5} because difference = {round(diff,2)}.")
         return True
     if buyPrice - (currPrice - 0.5) >= stoploss :
         print(f"Trying to sell at {currPrice - 0.5} because of stop loss.")
@@ -75,7 +75,7 @@ def sellAlgorithm( buyBook : dict , sellBook : dict ,buyPrice : int ,orderType :
 
 def trade( topicId : list[int] ) : 
     while True :
-        with open("logs/output.txt") as f:
+        with open("logs/binancePrice.txt") as f:
             x = f.read()
             if x != "":
                 break
@@ -97,19 +97,30 @@ def trade( topicId : list[int] ) :
                         buy_price = abs(buy_price)
                         # SEND EMAIL
                         logging.info(f"Buying {orderType} for {buy_price}...")
-                        order_id = buy( eventId , buy_price , orderType )
+                        a = time.time()
+                        order_id = buy( eventId , buy_price , orderType , quantity )
+                        b = time.time()
                         time.sleep(0.2)
+                        logging.info(f"TIme to buy = {b-a}")
                         status = trade_status(eventId, order_id)
-                        if status == 'Pending' :
+                        if status['status'] == 'Pending' :
                             logging.info("Order didn't match, cancelling it.")
                             print("Order didn't match, cancelling it.")
-                            while status != 'Cancelled':
+                            while status['status'] != 'Cancelled':
                                 cancel_order(eventId,order_id)
                                 status = trade_status(eventId,order_id)
+                                if status == None :
+                                    break
                             print("Order Cancelled.")
                             logging.info("Order Cancelled")
-                        elif status == 'Matched':
-                            sell( min(buy_price + bookprofit,9.5) , order_id)
+                        elif status['status'] == 'Matched':
+                            buy_price = status['buyPrice']
+                            print(f"Order Placed for {buy_price}.")
+                            logging.info(f"Order Placed for {buy_price}.")
+                            if buy_price < 3 :
+                                sell ( buy_price, order_id )
+                            else : 
+                                sell( min(buy_price + bookprofit,9.5) , order_id)
                             isToBuy = False
                             print("Analyzing for selling...")
                             logging.info("Analyzing for selling...")
@@ -117,25 +128,25 @@ def trade( topicId : list[int] ) :
                             print(f"STATUS = {status}.............")
                             logging.info(f"STATUS = {status}.............")
                 else :
-                    if 'Exited' in trade_status(eventId,order_id):
-                        profit = (trade_status(eventId,order_id).split()[-1])
+                    curr_status = trade_status(eventId,order_id)
+                    if 'Exited' in curr_status['status']:
+                        profit = (curr_status['status'].split()[-1])
                         # SEND EMAIL
-                        print(f"Order sold, profit/loss = {profit}.")
+                        print(f"Order sold, profit/loss = \033[32m{profit}.\033[30m")
                         logging.info(f"Order sold, profit/loss = {profit}.")
                         print("Analyzing to Buy...")
                         logging.info("Analyzing to Buy...")
                         isToBuy = True
-                        continue
-                    if sellAlgorithm(d['buyData'],d['sellData'],buy_price,orderType) :
+                    elif sellAlgorithm(d['buyData'],d['sellData'],buy_price,orderType) :
                         cancel_order(eventId,order_id)
                         sell(0.5 , order_id)
                         time.sleep(0.5)
-                        profit = (trade_status(eventId,order_id).split()[-1])
-                        logging.info(f"Order sold, Loss = {profit}")
+                        profit = (trade_status(eventId,order_id)['status'].split()[-1])
+                        logging.info(f"Order sold, Loss =  \033[32m{profit}.\033[30m")
+                        print(f"Order sold, Loss =  \033[32m{profit}.\033[30m")
                         isToBuy = True
                         print(f"Analyzing to buy.")
                         logging.info("Analyzing to Buy...")
-                # time.sleep(5)
     except Exception as e:  
         sendEmail("Algorithm has crashed.")
         logging.exception(f"ERROR {e}")
@@ -147,6 +158,7 @@ bitcoinPriceDiff = 5
 stoploss = 1.5
 bookprofit = 1.5
 ignores = [0,1,8]
+quantity = 3
 
 # thread1 = threading.Thread(target=collectBitcoinPriceFromProbo, args=())
 thread2 = threading.Thread(target=collectBitcoinPriceFromBinance, args=())

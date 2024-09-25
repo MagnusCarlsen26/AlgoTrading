@@ -1,1 +1,0 @@
-2024-09-23 23:01:39.224 - INFO - Thread-2 (trade) - Question : Bitcoin to be priced at 63223.99 USDT or more at 11:10 PM?

@@ -44,10 +44,9 @@ def fetch( endpoint: str , headers: dict , data: dict , method = Literal['POST',
         else :
             print(f'Error : {response.status_code}')
             print(response.text)
-            # EXIT THE PROGRAM
     except (ConnectionError, Timeout, MaxRetryError, NewConnectionError) as e:
         return fetch(endpoint,headers,data,method)
-    else:
+    except Exception as e:
         print(f"Exception while fetching() ")
         traceback.print_exc()
         # Exit the program
@@ -148,22 +147,24 @@ def trade_status(eventId : int , order_id: int):
         data = fetch(endpoint , headers , data , 'GET')
         if 'records' not in data :
             return trade_status(eventId,order_id)
+        
         trades = data['records']['tradeSummary']
-
+        
         for trade in trades :
             for tr in trade['sectionData'] :
                 if tr['order_id'] == order_id :
                     status = trade['sectionTitle']
                     if status == 'Pending Orders' :
-                        return 'Pending'
+                        return { "status" : 'Pending'  , "buyPrice" : tr['price']}
                     elif status == 'Matched Orders' :
-                        return 'Matched'
+                        return { "status" : 'Matched'  , "buyPrice" : tr['price']}
                     elif status == 'Exited Orders' :
-                        return f"Exited {tr['profit']}"
+                        return { "status" : f"Exited {tr['profit']}" , "buyPrice" :  tr['price'] }
                     elif status == 'Cancelled Orders':
-                        return 'Cancelled'   
+                        return { "status" : 'Cancelled'  , "buyPrice" : tr['price']}   
                     elif status == 'Exiting Orders':
-                        return 'Exiting'
+                        return { "status" : 'Exiting'  , "buyPrice" : tr['price']}
+        return 
     except Exception as e:
         traceback.print_exc()
         logging.exception(f"{e}Error in trade_status()")
