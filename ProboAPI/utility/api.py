@@ -207,7 +207,6 @@ def collectBitcoinPriceFromProbo() :
         if data.get("t") == "d" and data.get("d", {}).get("b", {}).get("p") == "crypto/btcusdt":
             try:
                 currBitcoinPrice = float(data["d"]["b"]["d"]["closePrice"])
-                print(currBitcoinPrice)
                 with open("logs/proboPrice.txt","w") as f :
                     f.write(str(currBitcoinPrice))
 
@@ -261,62 +260,58 @@ def collectBitcoinData( topicId : list[int] ) :
     try :
         while True:
             eventId = getEventIds([topicId])[0]
+            print(eventId)
             while True :
-                d = buyBook(eventId)
-                if d['buyData'] :
-                    today = datetime.today()
-                    date = today.strftime("%Y-%m-%d")
-                    folderName = d['title'][-9:][:8].replace(':','-')[-9:][:8].replace(':','-') + " " + d['title'].split()[5]
-                    folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
-                    binancePrice = None
-                    while True:
-                        with open("logs/proboPrice.txt", "r") as file :
-                            try:
-                                bitcoinPrice = float(file.read().strip())
-                                break
-                            except ValueError as e:
-                                print(f"error while reading bitcoinPrice : error : {e}")
-                                
-                    while True :
-                        with open("logs/binancePrice.txt", "r") as file :
-                            try:
-                                binancePrice = float(file.read().strip())
-                                break
-                            except ValueError as e:
-                                print(f"error while reading binancePrice : error : {e}")
-                                
-                        
-                    d['buyData']["bitcoinPricefromProbo"] = bitcoinPrice
-                    d['sellData']["bitcoinPricefromProbo"] = bitcoinPrice
-                    d['buyData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                d = {}
+                binancePrice = None
+                while True :
+                    with open("logs/proboPrice.txt", "r") as file :
+                        try:
+                            bitcoinPrice = float(file.read().strip())
+                            d["bitcoinPricefromProbo"] = bitcoinPrice
+                            d["bitcoinPricefromBinance"] = binancePrice
 
-                    d['buyData']["bitcoinPricefromBinance"] = binancePrice
-                    d['sellData']["bitcoinPricefromBinance"] = binancePrice
-                    d['sellData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                    print(bitcoinPrice,binancePrice )
-                    if d['buyData'] == {} :
-                        break
-                    save('yes' , d['buyData'] , folderName )
-                    save('no' , d['sellData'] , folderName )
-                else :
-                    break
+                            break
+                        except ValueError as e:
+                            print(f"error while reading bitcoinPrice : error : {e}")
+                            
+                while True :
+                    with open("logs/binancePrice.txt", "r") as file :
+                        try:
+                            binancePrice = float(file.read().strip())
+                            d["bitcoinPricefromProbo"] = bitcoinPrice
+                            d["bitcoinPricefromBinance"] = binancePrice
+
+                            break
+                        except ValueError as e:
+                            print(f"error while reading binancePrice : error : {e}")
+                  
+                collectEventPrice(eventId, d)
     except Exception as e:
         print("Error while collecting bitcoin data ... ",e)
         collectBitcoinData(topicId)
 
-def collectEventPrice( eventId : list[int] ) :
+def collectEventPrice( eventId : list[int], additionalData : dict ) :
     try :
-        while True :
-            d = buyBook(eventId)
-            today = datetime.today()
-            date = today.strftime("%Y-%m-%d")
-            folderName = d['title']
-            folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
-            d['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-            if d['buyData'] == {} :
-                break
-            save('yes' , d['buyData'] , folderName )
-            save('no' , d['sellData'] , folderName )
+        d = buyBook(eventId)
+
+        today = datetime.today()
+        date = today.strftime("%Y-%m-%d")
+        folderName = d['title']
+        folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
+        d['buyData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        d['sellData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+        for key in additionalData :
+            d['buyData'][key] = additionalData[key]
+            d['sellData'][key] = additionalData[key]
+
+        if d['buyData'] == {} :
+            return
+        
+        save('yes' , d['buyData'] , folderName )
+        save('no' , d['sellData'] , folderName )
+
     except Exception as e:
         print("Error while collecting data ... ",e)
         collectEventPrice(eventId)
