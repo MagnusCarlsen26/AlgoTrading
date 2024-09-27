@@ -314,4 +314,4 @@ def collectEventPrice( eventId : list[int], additionalData : dict ) :
 
     except Exception as e:
         print("Error while collecting data ... ",e)
-        collectEventPrice(eventId)
+        collectEventPrice(eventId , additionalData)
