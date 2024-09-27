@@ -42,6 +42,7 @@ def buyAlgorithm( buyBook : dict , sellBook  : dict ) -> int :
             return 0
 
     if factor*diff >= bitcoinPriceDiff :
+        
         print(f"Trying to buy {factor} at {currPrice}, diff = {round(diff,2)}")
         logging.info(f"Trying to buy {factor}, diff = {round(diff,2)}")
         return factor*currPrice
@@ -163,9 +164,9 @@ quantity = 3
 # thread1 = threading.Thread(target=collectBitcoinPriceFromProbo, args=())
 thread2 = threading.Thread(target=collectBitcoinPriceFromBinance, args=())
 # thread3 = threading.Thread(target=collectBitcoinData,args=([2449]))
-thread4 = threading.Thread(target=trade, args=([2449]))
+# thread4 = threading.Thread(target=trade, args=([2449]))
 
 # thread1.start()
 thread2.start()
 # thread3.start()
-thread4.start()
+# thread4.start()
