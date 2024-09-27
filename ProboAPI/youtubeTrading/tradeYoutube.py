@@ -78,4 +78,4 @@ def fetchQuestion( eventId : int ):
     # buyAlgorithm( yt_title, target_time, target_views )
     # lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title)
 
-fetchQuestion(3082415)
+fetchQuestion(3082798)

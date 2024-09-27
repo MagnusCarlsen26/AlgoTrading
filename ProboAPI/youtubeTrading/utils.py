@@ -46,4 +46,4 @@ def cronUpdateViews():
         
         time.sleep(5*60)
 
-cronUpdateViews()
+# cronUpdateViews()

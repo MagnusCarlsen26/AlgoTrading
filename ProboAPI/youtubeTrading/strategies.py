@@ -49,9 +49,11 @@ def lastMinuteBuyStrat(eventId,target_views,video_id,title ) :
                     continue
                 print("Buying no")
                 buy(eventId,9.5,'no')
+                return
             else :
                 print("Buying yes")
                 buy(eventId,9.5,'yes')
+                return
         time.sleep(0.1)
 
 def interpolateStrat( target_views, endTime, yt_title) :
