@@ -36,7 +36,7 @@ def lastMinuteBuyStrat(eventId,target_views,video_id,title ) :
         if curr_views != prev :
 
             if target_views < curr_views :
-                buy(eventId,9.5,'yes',5)
+                buy(eventId,9.5,'yes',1)
                 print("Buying yes")
                 print(curr_views)
                 print(time.time())
