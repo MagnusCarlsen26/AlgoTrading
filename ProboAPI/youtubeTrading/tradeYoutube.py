@@ -19,7 +19,11 @@ configs = {
     },
     "Linkin Park - Heavy Is The Crown": {
         "video_id": "5FrhtahQiRc",
-    }
+    },
+    "MrBeast - 100 Identical Twins" : {
+        "video_id": "snX5YyflrGw"
+    },
+
 }
 
 def getViews(video_id,target_count,view_rate,title, endTime,history_view_rate) :
@@ -65,17 +69,17 @@ def fetchQuestion( eventId : int ):
     
     yt_title = eventInfo['title'][ eventInfo['title'].index('\'') + 1 : lastIndex ]
     target_views = float(util[3][:-1])*1000000
-    target_time = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
+    # target_time = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
     
-    with open('config.json', 'r',encoding="utf-8") as file:
-        videosData = json.load(file)
-    history_view_rate = videosData[yt_title]["history_view_rate"]
+    # with open('config.json', 'r',encoding="utf-8") as file:
+    #     videosData = json.load(file)
+    # history_view_rate = videosData[yt_title]["history_view_rate"]
 
 
     
-    getViews( configs[yt_title]["video_id"], target_views, view_rate=13000, title=eventInfo['title'], endTime = target_time, history_view_rate= history_view_rate )
+    # getViews( configs[yt_title]["video_id"], target_views, view_rate=13000, title=eventInfo['title'], endTime = target_time, history_view_rate= history_view_rate )
     # interpolateStrat(target_views, target_time,yt_title)
     # buyAlgorithm( yt_title, target_time, target_views )
-    # lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title)
+    lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title)
 
-fetchQuestion(3082798)
+fetchQuestion(int(input("Enter Event id : ")))

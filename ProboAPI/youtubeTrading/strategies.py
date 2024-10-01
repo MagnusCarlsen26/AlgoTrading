@@ -25,15 +25,6 @@ def lastMinuteBuyStrat(eventId,target_views,video_id,title ) :
         but I will limit it during testing.
     """
     prev = None
-    with open('config.json', 'r',encoding="utf-8") as file:
-        videosData = json.load(file)
-    history_view_rate = videosData[title]["history_view_rate"]
-
-    average_history_view_rate = 0
-    for i in range(-1,-4,-1):
-        average_history_view_rate += int(list(history_view_rate[i].values())[0])
-    average_history_view_rate = average_history_view_rate//3
-
     while True:
 
         curr_views = ytAPI(video_id)
@@ -44,17 +35,15 @@ def lastMinuteBuyStrat(eventId,target_views,video_id,title ) :
 
         if curr_views != prev :
 
-            if target_views > curr_views :
-                if (target_views - curr_views) < 0.65*average_history_view_rate :
-                    continue
-                print("Buying no")
-                buy(eventId,9.5,'no')
+            if target_views < curr_views :
+                buy(eventId,9.5,'yes',5)
+                print("Buying yes")
+                print(curr_views)
+                print(time.time())
                 return
             else :
-                print("Buying yes")
-                buy(eventId,9.5,'yes')
-                return
-        time.sleep(0.1)
+                prev = curr_views
+                print(f"Views updated = {prev}")
 
 def interpolateStrat( target_views, endTime, yt_title) :
 
