@@ -1,7 +1,6 @@
 import requests
 from dotenv import load_dotenv
 import os
-from utility.save import save
 import json
 from datetime import datetime,timezone
 import websocket

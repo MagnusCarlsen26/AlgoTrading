@@ -7,11 +7,19 @@ import time
 from typing import Literal
 import logging
 from datetime import datetime
-from utils import ytAPI
+from utility.utils import ytAPI,latestQuestionSelector,calcTimeStepsLeft
 from strategies import interpolateStrat, lastMinuteBuyStrat
 from strategies import calcTimeStepsLeft
 import json
+import logging
 
+logging.basicConfig(
+    filename='logs/history_logs.txt', 
+    level=logging.INFO,
+    filemode='a', 
+    format='%(asctime)s.%(msecs)03d - %(levelname)s - %(threadName)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 configs = {
     "CTRL - Official Trailer": {
         "video_id": "KEfeMPGj-Dw",
@@ -63,23 +71,33 @@ def saveCurrViews( eventId : int ):
 
 def fetchQuestion( eventId : int ):
 
-    eventInfo = buyBook( eventId )    
+    eventInfo = buyBook( eventId )   
     lastIndex = eventInfo['title'].rindex('\'') 
     util = eventInfo['title'][ lastIndex+ 1 :  ].split()
     
     yt_title = eventInfo['title'][ eventInfo['title'].index('\'') + 1 : lastIndex ]
     target_views = float(util[3][:-1])*1000000
-    # target_time = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
-    
-    # with open('config.json', 'r',encoding="utf-8") as file:
-    #     videosData = json.load(file)
-    # history_view_rate = videosData[yt_title]["history_view_rate"]
+    target_time = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
+    print(eventInfo['title'])
+    logging.info(eventInfo['title'])
+    time_left = calcTimeStepsLeft(target_time,delta=1)
+    print(f"Time for event = {time_left} minutes")
+    logging.info(f"Time for event = {time_left} minutes")
+    if time_left > 2 :
+        print(f"Sleeping for 15 secs.")
+        logging.info(f"Sleeping for 15 secs.")
+        time.sleep((0.25)*60)
+        return
+    lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title,target_time)
 
-
-    
-    # getViews( configs[yt_title]["video_id"], target_views, view_rate=13000, title=eventInfo['title'], endTime = target_time, history_view_rate= history_view_rate )
-    # interpolateStrat(target_views, target_time,yt_title)
-    # buyAlgorithm( yt_title, target_time, target_views )
-    lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title)
-
-fetchQuestion(int(input("Enter Event id : ")))
+def trade( topicId : list[int] ):
+    try :
+        while True : 
+            eventId = latestQuestionSelector(topicId)
+            fetchQuestion(eventId)
+    except Exception as e  :
+        print("Error in trade()")
+        logging.info("Error in trade()")
+        print(e)
+        logging.info(e)
+trade(452)

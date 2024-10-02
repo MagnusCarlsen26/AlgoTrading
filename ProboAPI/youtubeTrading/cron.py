@@ -1,4 +1,4 @@
-from utils import ytAPI
+from utility.utils import ytAPI
 from datetime import datetime
 import json
 import time
