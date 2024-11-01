@@ -20,7 +20,10 @@ configs = {
     },
     "Rose & Bruno Mars - APT Music" : {
         "video_id" : "ekr2nIex040"
-    } 
+    }, 
+    "India's Got Latent - EP 09" : {
+        "video_id" : "ILu4LcipWI0"
+    }
 }
 
 def getViewService():

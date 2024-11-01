@@ -20,41 +20,54 @@ load_dotenv()
 last_key_worked = 1
 
 def ytAPI(video_id):
-
-    try :
+    global last_key_worked
+    try:
         api_key = os.environ.get(f"YT_API_{last_key_worked}")
         url = f'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}'
         response = requests.get(url)
-    except :
-        for i in range(1,5):
-            try :
-                api_key =  os.environ.get(f"YT_API_{i}")
-                url = f'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}'
-                response = requests.get(url)
-            except Exception as e:
-                print(f"YT_API_{i} didn't work")
-                logging.info(f"YT_API_{i} didn't work")
-                print(e)
-                logging.info(e)
-                continue
-            last_key_worked = i
-            break
-        else :
-            print("None keys work, aborting trading.")
-            logging.info("None keys work, aborting trading.")
-            exit()
 
-    if response.status_code == 200:
-        data = response.json()
-        if 'items' in data and len(data['items']) > 0:
+        if response.status_code == 200:
+            data = response.json()
+            if 'items' in data and len(data['items']) > 0:
                 view_count = data['items'][0]['statistics']['viewCount']
                 return int(view_count)
+            else:
+                print('No video found with the given ID.')
+                logging.info('No video found with the given ID.')
         else:
-            print('No video found with the given ID.')
-            logging.info('No video found with the given ID.')
-    else:
-        print(f'Error: {response.status_code}, {response.text}')
-        logging.info(f'Error: {response.status_code}, {response.text}')
+            print(f'Error: {response.status_code}')
+
+    except Exception as e:
+        logging.error(f"Initial API call failed: {e}")
+
+    for i in range(1, 13):
+        try:
+            api_key = os.environ.get(f"YT_API_{i}")
+            url = f'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}'
+            print(f"Trying with API key: YT_API_{i}")
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json()
+                if 'items' in data and len(data['items']) > 0:
+                    view_count = data['items'][0]['statistics']['viewCount']
+                    last_key_worked = i 
+                    return int(view_count)
+                else:
+                    print('No video found with the given ID.')
+                    logging.info('No video found with the given ID.')
+            else:
+                print(f'Error with API key YT_API_{i}: {response.status_code}')
+                logging.info(f'Error with API key YT_API_{i}: {response.status_code}')
+
+        except Exception as e:
+            logging.error(f"API key YT_API_{i} failed: {e}")
+            print(f"YT_API_{i} didn't work")
+            logging.info(f"YT_API_{i} didn't work")
+
+    print("None of the keys worked, aborting trading.")
+    logging.info("None of the keys worked, aborting trading.")
+    exit()
 
 def calcTimeStepsLeft( endTime, delta ):   
 
