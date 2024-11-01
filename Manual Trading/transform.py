@@ -1,17 +1,10 @@
 from datetime import datetime
 import pandas as pd
-def transform(type,data,title):
+def transform(data):
 
-    i = 0.5
-    d = {}
-    while i<10:
-        d[i] = 0
-        i += 0.5
-    for i in range(len(data)):
-        if data[i]['price'] !=  0:
-            d[data[i]['price']] = data[i]['quantity']
-    transposed_data = {str(key): [value] for key, value in d.items()}
-    
-    df = pd.DataFrame(transposed_data)
-    
-    return df
+    cum_sum = 0
+    for i in range(1,20):
+        x = data[str(i/2)]
+        data[str(i/2)] -= cum_sum
+        cum_sum += data[str(i/2)]
+    return data
