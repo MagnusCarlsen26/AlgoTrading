@@ -21,13 +21,12 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 configs = {
-    "Vicky Vidya Ka Woh Wala - Mushkil Hai": {
-        "video_id": "Ez6jGMpdCNY",
+    "Kabhi Main Kabhi Tum - Ep 33" : {
+        "video_id" : "EiNlWJfXKlU"
     },
-    "MrBeast - 100 Identical Twins" : {
-        "video_id": "snX5YyflrGw"
-    },
-
+    "BABYMONSTER - 'CLIK CLAK" : {
+        "video_id" : "o0oW3lPoOXM"
+    }
 }
 
 def getViews(eventId) :
@@ -39,12 +38,6 @@ def getViews(eventId) :
     target_count = float(util[3][:-1])*1000000
     endTime = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
 
-    # average_history_view_rate = 0
-    # for i in range(-1,-4,-1):
-        # average_history_view_rate += int(list(history_view_rate[i].values())[0])
-    # average_history_view_rate = average_history_view_rate//3
-
-
     while True:
         view_count = ytAPI(video_id)
         with open(f"logs/views.txt","w") as f:
@@ -54,11 +47,9 @@ def getViews(eventId) :
             f.write(f"difference = {int(target_count - float(view_count)):,}\n")
             f.write(f"Time stamp left = {calcTimeStepsLeft(endTime,5)}\n")
             f.write(f"Average Required = {int(target_count - float(view_count))//calcTimeStepsLeft(endTime,5)}\n")
-            # f.write(f"view rate = {int(average_history_view_rate):,}\n")
-            # f.write(f"Prev view rate = {(history_view_rate[-1])}\n")
-            # f.write(f"Prev view rate = {(history_view_rate[-2])}\n")
-            # f.write(f"Prev view rate = {(history_view_rate[-3])}\n")
-        time.sleep(5)
+        current_minutes = datetime.now().minute
+        sleep_duration = 5 if current_minutes % 5 < 3 else 0
+        time.sleep(sleep_duration)
 
 
 def saveCurrViews( eventId : int ):
@@ -104,8 +95,10 @@ def trade( topicId : list[int] ):
         print(e)
         logging.info(e)
 
-eventId = int(input("Enter Event Id : "))
-while True :
-    # fetchQuestion(eventId)
-    getViews(eventId)
+# getViews( int(input("Enter eventtID : ")) )
+getViews( 3223536 )
+# eventId = int(input("Enter Event Id : "))
+# while True :
+#     # fetchQuestion(eventId)
+#     getViews(eventId)
 # trade(452)

@@ -1,5 +1,6 @@
-'Linkin Park - Heavy Is The Crown' video to cross 17.83M views at 12:20 AM?
-curr views = 17,833,382
-target views = 17,830,000
-difference = -3,382
-Time stamp left = 0
+Kabhi Main Kabhi Tum - Ep 33
+curr views = 18,350,075
+target views = 18,360,000
+difference = 9,925
+Time stamp left = 1
+Average Required = 9925

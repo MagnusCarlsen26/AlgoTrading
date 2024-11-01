@@ -60,7 +60,7 @@ def calcTimeStepsLeft( endTime, delta ):
 
     curr_time = datetime.now()
     endTime = datetime.combine(curr_time.date(), endTime)
-    return math.floor( (endTime - curr_time)/timedelta(minutes=delta) )
+    return math.ceil( (endTime - curr_time)/timedelta(minutes=delta) )
 
 def latestQuestionSelector( topicId : list[int] ) -> int:
     eventIds = getEventIds([topicId])
