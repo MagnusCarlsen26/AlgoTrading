@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import math
 from utility.api import buy
 import json
-from utility.utils import calcTimeStepsLeft
+from utility.utils import calcTimeStepsLeft,getVideoId
 import logging
 
 logging.basicConfig(
@@ -15,7 +15,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-def lastMinuteBuyStrat(eventId,target_views,video_id,title,target_time ) :
+def lastMinuteBuyStrat(eventId,target_views,target_time ) :
 
     """
         Let's say question deadline is 4:45 PM and at 4:41 PM required views = 13K.
@@ -27,6 +27,7 @@ def lastMinuteBuyStrat(eventId,target_views,video_id,title,target_time ) :
         but I will limit it during testing.
     """
     prev = None
+    video_id = getVideoId(eventId)
     print(f"Starting to check at {datetime.now().time()}")
     logging.info(f"Starting to check at {datetime.now().time()}")
     while datetime.now().time()<target_time:

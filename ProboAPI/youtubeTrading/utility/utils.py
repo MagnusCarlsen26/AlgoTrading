@@ -6,8 +6,10 @@ from datetime import datetime
 import time
 import math
 from datetime import datetime, timedelta
-from .api import getEventIds,buyBook
+from .api import getEventIds,buyBook,getSlug
 import logging
+from bs4 import BeautifulSoup
+import re
 
 logging.basicConfig(
     filename='logs/history_logs.txt', 
@@ -84,6 +86,8 @@ def latestQuestionSelector( topicId : list[int] ) -> int:
     latest_event = None
     for eventId in eventIds :
         title = buyBook(eventId)['title'][-9:][:8]
+        if "12:00 AM" in title :
+            continue
         title = datetime.strptime(title,"%I:%M %p")
         if latest_time == None :
             latest_time = title
@@ -94,3 +98,27 @@ def latestQuestionSelector( topicId : list[int] ) -> int:
                 latest_event = eventId
 
     return latest_event    
+
+def extractVideoIdFromHTML( html : str ) -> str : 
+        soup = BeautifulSoup(html.text, "html.parser")
+
+        script_tag = soup.find('script', {'id': '__NEXT_DATA__', 'type': 'application/json'})
+        j = json.loads(script_tag.string)
+
+        link = (j["props"]["pageProps"]["props"]["eventMeta"]["news"][0]["link"])
+
+        match = re.search(r"[?&]v=([^&]+)", link)
+        video_id = match.group(1) if match else None
+        return video_id
+
+def getVideoId( eventId : int ) -> str:
+
+    try:
+        slug = getSlug( [452] , eventId )
+        response = requests.get(f"https://probo.in/events/{slug}")
+        response.raise_for_status()  
+
+        return extractVideoIdFromHTML(response)
+
+    except requests.exceptions.RequestException as err:
+        print(err)

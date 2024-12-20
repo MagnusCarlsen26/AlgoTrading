@@ -94,8 +94,9 @@ def buyBook( eventId : int ) -> dict :
         logging.exception(f"{e}Error in butbook()")
         logging.exception(e)
 
-        
-# Confirmation checking IS LEFT
+
+ # Confirmation checking IS LEFT
+
 def cancel_order(event_id : int, order_id : int ):
     try:
         endpoint = f"v1/oms/order/cancel/{order_id}?eventId={event_id}"
@@ -199,6 +200,75 @@ def getBuyPrice( buyBook : dict ) -> int :
             return float(i)
     return 10
 
+def getSlug( topicId : list[int] , eventId : int ) -> str :
+    try :
+        url = "https://prod.api.probo.in/api/v1/product/public/arena/events"
+        headers = {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9",
+            "appid": "in.probo.pro",
+            "authorization": "Bearer undefined",  # Replace 'undefined' with your token
+            "content-type": "application/json",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-site",
+            "x-device-os": "ANDROID",
+            "x-version-name": "10",
+            "Referer": "https://probo.in/",
+            "Referrer-Policy": "strict-origin-when-cross-origin"
+        }
+
+        body = {
+            "page": 1,
+            "limit": 15,
+            "sortType": "",
+            "filter": {},
+            "topicIds": [452]
+        }
+
+        response = requests.post(url, json=body, headers=headers)
+        response = ((response.json()))
+
+        for event in response["data"]["records"]["events"] :
+            if event["id"] == eventId:
+                return event["slug"]
+            
+
+    except Exception as e :
+        traceback.print_exc()
+        logging.exception(f"{e}Error in getSlug()")
+        logging.exception(e)
+
+def collectEventPrice( eventId : list[int], additionalData : dict ) :
+    try :
+        d = buyBook(eventId)
+
+        today = datetime.today()
+        date = today.strftime("%Y-%m-%d")
+        folderName = d['title']
+        folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
+        d['buyData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        d['sellData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+        for key in additionalData :
+            d['buyData'][key] = additionalData[key]
+            d['sellData'][key] = additionalData[key]
+
+        if d['buyData'] == {} :
+            return
+        
+        save('yes' , d['buyData'] , folderName )
+        save('no' , d['sellData'] , folderName )
+
+    except Exception as e:
+        print("Error while collecting data ... ",e)
+        collectEventPrice(eventId , additionalData)
+
+
 def collectBitcoinPriceFromProbo() :
     def on_message(ws,message):
         data = json.loads(message)
@@ -289,28 +359,3 @@ def collectBitcoinData( topicId : list[int] ) :
     except Exception as e:
         print("Error while collecting bitcoin data ... ",e)
         collectBitcoinData(topicId)
-
-def collectEventPrice( eventId : list[int], additionalData : dict ) :
-    try :
-        d = buyBook(eventId)
-
-        today = datetime.today()
-        date = today.strftime("%Y-%m-%d")
-        folderName = d['title']
-        folderName = 'dataCollected/' + '/' +str(date) + '/' +folderName
-        d['buyData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-        d['sellData']['time'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-
-        for key in additionalData :
-            d['buyData'][key] = additionalData[key]
-            d['sellData'][key] = additionalData[key]
-
-        if d['buyData'] == {} :
-            return
-        
-        save('yes' , d['buyData'] , folderName )
-        save('no' , d['sellData'] , folderName )
-
-    except Exception as e:
-        print("Error while collecting data ... ",e)
-        collectEventPrice(eventId , additionalData)

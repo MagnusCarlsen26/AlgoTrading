@@ -7,7 +7,7 @@ import time
 from typing import Literal
 import logging
 from datetime import datetime
-from utility.utils import ytAPI,latestQuestionSelector,calcTimeStepsLeft
+from utility.utils import ytAPI,latestQuestionSelector,calcTimeStepsLeft,getVideoId
 from strategies import interpolateStrat, lastMinuteBuyStrat
 from strategies import calcTimeStepsLeft
 import json
@@ -30,7 +30,8 @@ configs = {
 }
 
 def getViews(eventId) :
-    eventInfo = buyBook( eventId )   
+    eventInfo = buyBook( eventId )
+    print(eventInfo)   
     lastIndex = eventInfo['title'].rindex('\'') 
     util = eventInfo['title'][ lastIndex+ 1 :  ].split()
     title = eventInfo['title'][ eventInfo['title'].index('\'') + 1 : lastIndex ]
@@ -69,7 +70,6 @@ def fetchQuestion( eventId : int ):
     lastIndex = eventInfo['title'].rindex('\'') 
     util = eventInfo['title'][ lastIndex+ 1 :  ].split()
     
-    yt_title = eventInfo['title'][ eventInfo['title'].index('\'') + 1 : lastIndex ]
     target_views = float(util[3][:-1])*1000000
     target_time = datetime.strptime(util[6] + " " + util[7][:-1], "%I:%M %p").time()
     logging.info(eventInfo['title'])
@@ -82,7 +82,8 @@ def fetchQuestion( eventId : int ):
         logging.info(f"Sleeping for 15 secs.")
         time.sleep((0.25)*60)
         return
-    lastMinuteBuyStrat(eventId,target_views, configs[yt_title]["video_id"],yt_title,target_time)
+    
+    lastMinuteBuyStrat(eventId,target_views,target_time)
 
 def trade( topicId : list[int] ):
     try :
@@ -95,10 +96,4 @@ def trade( topicId : list[int] ):
         print(e)
         logging.info(e)
 
-# getViews( int(input("Enter eventtID : ")) )
-getViews( 3223536 )
-# eventId = int(input("Enter Event Id : "))
-# while True :
-#     # fetchQuestion(eventId)
-#     getViews(eventId)
-# trade(452)
+trade(452)

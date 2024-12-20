@@ -294,7 +294,6 @@ def collectBitcoinData( topicId : list[int] ) :
 def collectEventPrice( eventId : list[int], additionalData : dict ) :
     try :
         d = buyBook(eventId)
-
         today = datetime.today()
         date = today.strftime("%Y-%m-%d")
         folderName = d['title']
@@ -313,5 +312,6 @@ def collectEventPrice( eventId : list[int], additionalData : dict ) :
         save('no' , d['sellData'] , folderName )
 
     except Exception as e:
+        exit()
         print("Error while collecting data ... ",e)
         collectEventPrice(eventId , additionalData)
