@@ -227,7 +227,7 @@ def getSlug( topicId : list[int] , eventId : int ) -> str :
             "limit": 15,
             "sortType": "",
             "filter": {},
-            "topicIds": [452]
+            "topicIds": topicId
         }
 
         response = requests.post(url, json=body, headers=headers)
