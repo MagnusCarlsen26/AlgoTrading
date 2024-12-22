@@ -3,6 +3,15 @@ from utility.api import getSlug
 import json
 import re
 import requests
+import logging
+
+logging.basicConfig(
+    filename='logs/history_logs.txt', 
+    level=logging.INFO,
+    filemode='a', 
+    format='%(asctime)s.%(msecs)03d - %(levelname)s - %(threadName)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 with open('logs/config.json','r') as f:
     config = json.load(f)
