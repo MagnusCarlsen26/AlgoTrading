@@ -1,12 +1,3 @@
-Cargo.lock
-
-/target/
-
-/.cargo/
-
-/target/doc/
-
-*.rs.bk
-*.rs.swp
-
 .env
+
+
