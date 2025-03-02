@@ -25,8 +25,8 @@ def main():
     
     data = response.json()
     
-    duration = time.time() - start_time
-    print(f"Request took: {duration:.2f} seconds")
+    duration = (time.time() - start_time)*1000
+    print(f"Request took: {duration:.2f} milliseconds")
     
     # print(data)
 
