@@ -8,6 +8,8 @@ use std::env;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
 
+    let start_time = Instant::now();
+
     let client = reqwest::Client::new();
     
     let mut headers = HeaderMap::new();
@@ -17,8 +19,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     headers.insert("appid", HeaderValue::from_static("in.probo.pro"));
     headers.insert("authorization", HeaderValue::from_str(&format!("Bearer {}", env::var("PROBO_BEARER_TOKEN")?)).unwrap());
     headers.insert("content-type", HeaderValue::from_static("application/json"));
-
-    let start_time = Instant::now();
 
     let response = client
         .get("https://prod.api.probo.in/api/v3/tms/trade/bestAvailablePrice?eventId=3752921")
