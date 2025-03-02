@@ -1,5 +1,0 @@
-'CTRL - Official Trailer' video to cross 7.68M views at 05:05 PM?
-curr views = 7,667,452
-target views = 7,680,000
-difference = 12,548
-view rate = 13,000

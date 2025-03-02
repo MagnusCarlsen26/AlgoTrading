@@ -1,8 +1,0 @@
-https://console.cloud.google.com/apis/credentials?authuser=1&project=yourbase-1-80627
-https://console.cloud.google.com/apis/credentials?authuser=1&project=yourbase-2-80653
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-1-80800
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-2-80827
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-3-80850
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-4-80877
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-5-80903
-https://console.cloud.google.com/apis/credentials?authuser=0&project=yourbase-6-80930
