@@ -30,8 +30,9 @@ int main() {
         return 1;
     }
     
-    // Response string
+    // Response string - pre-allocate space to reduce reallocations
     std::string response_data;
+    response_data.reserve(16384);  // Reserve 16KB initial capacity
     
     // Prepare headers
     struct curl_slist* headers = NULL;
@@ -44,11 +45,20 @@ int main() {
     headers = curl_slist_append(headers, auth_header.c_str());
     headers = curl_slist_append(headers, "content-type: application/json");
     
-    // Set curl options
+    // Set curl options for performance
     curl_easy_setopt(curl, CURLOPT_URL, "https://prod.api.probo.in/api/v3/tms/trade/bestAvailablePrice?eventId=3752921");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+    
+    // Performance optimizations
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);              // 5 seconds timeout
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 2L);       // 2 seconds connect timeout
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);             // Prevent curl from using signals
+    curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0); // Use HTTP/2 if available
+    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 102400L);      // Use a larger buffer (100KB)
+    curl_easy_setopt(curl, CURLOPT_TCP_FASTOPEN, 1L);         // Enable TCP Fast Open if available
     
     // Perform the request
     CURLcode res = curl_easy_perform(curl);
